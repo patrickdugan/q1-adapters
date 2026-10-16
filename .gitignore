@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+# weights live outside the repo (C:\Users\patri\Documents\Codex\models); never commit them
+*.gguf
+*.safetensors
+_trainer/
+# server/process logs
+runs/servers/
+runs/*.out.log
+runs/smoke/
