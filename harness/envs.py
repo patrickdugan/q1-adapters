@@ -75,11 +75,11 @@ class _ClassicEnv:
     def _load(self):  # pragma: no cover - per env
         raise NotImplementedError
 
-    def _rows(self, split: str):
+    def _rows(self, split: str, n: int | None = None):
         raise NotImplementedError
 
     def examples(self, split: str, n: int | None = None, seed: int = 0) -> list[Example]:
-        rows = self._rows(split)
+        rows = self._rows(split, n)
         idx = list(range(len(rows)))
         if split == "train" and n is not None:
             random.Random(seed).shuffle(idx)
@@ -116,8 +116,8 @@ class ReverseText(_ClassicEnv):
 
         return reverse_text.load_environment()
 
-    def _rows(self, split):
-        ds = self.env.dataset  # 1000 rows, train only: hold out the last EVAL_N
+    def _rows(self, split, n=None):
+        ds = self.env.dataset  # 1000 rows, train only: hold out the last EVAL_N (fixed; n cannot extend it)
         cut = len(ds) - EVAL_N
         return ds.select(range(cut, len(ds))) if split == "eval" else ds.select(range(cut))
 
@@ -131,8 +131,12 @@ class MedMCQA(_ClassicEnv):
 
         return OpenMed_MedMCQA.load_environment()
 
-    def _rows(self, split):
-        return self.env.eval_dataset.select(range(EVAL_N)) if split == "eval" else self.env.dataset
+    def _rows(self, split, n=None):
+        # eval = the first max(EVAL_N, n) rows of the validation split, so a larger n extends the
+        # same prefix (the first 200 stay identical and paired)
+        if split == "eval":
+            return self.env.eval_dataset.select(range(min(len(self.env.eval_dataset), max(EVAL_N, n or 0))))
+        return self.env.dataset
 
 
 class IFEval(_ClassicEnv):
@@ -144,8 +148,8 @@ class IFEval(_ClassicEnv):
 
         return ifeval.load_environment()  # eval = the env's own 200-row seeded holdout
 
-    def _rows(self, split):
-        return self.env.eval_dataset if split == "eval" else self.env.dataset
+    def _rows(self, split, n=None):
+        return self.env.eval_dataset if split == "eval" else self.env.dataset  # eval = fixed 200-row holdout
 
 
 class GSM8K:

@@ -1,0 +1,107 @@
+{
+  "reverse-text": {
+    "n_common": 200,
+    "q4_1.7b_base": null,
+    "q1_base": 0.11547322102239573,
+    "q1_ours": 0.8171459398828465,
+    "q4_base": null,
+    "q1_online": null,
+    "q4_online": null,
+    "q4_bonsai_adapter": null,
+    "delta_q1_ours_vs_q1_base": {
+      "n": 200,
+      "delta": 0.7016727188604507,
+      "ci95": [
+        0.6819717835683409,
+        0.7218324754017347
+      ]
+    }
+  },
+  "gsm8k": {
+    "n_common": 200,
+    "q4_1.7b_base": null,
+    "q1_base": 0.845,
+    "q1_ours": 0.875,
+    "q4_base": null,
+    "q1_online": {
+      "adapter": "q1+online-gsm8k-grpo",
+      "score": 0.87
+    },
+    "q4_online": null,
+    "q4_bonsai_adapter": null,
+    "delta_q1_ours_vs_q1_base": {
+      "n": 200,
+      "delta": 0.03,
+      "ci95": [
+        -0.02,
+        0.075
+      ]
+    },
+    "delta_q1_online_vs_q1_base": {
+      "n": 200,
+      "delta": 0.025,
+      "ci95": [
+        -0.025,
+        0.075
+      ]
+    }
+  },
+  "medmcqa": {
+    "n_common": 200,
+    "q4_1.7b_base": null,
+    "q1_base": 0.375,
+    "q1_ours": 0.44,
+    "q4_base": null,
+    "q1_online": {
+      "adapter": "q1+online-medmcqa-vireshk",
+      "score": 0.42
+    },
+    "q4_online": null,
+    "q4_bonsai_adapter": null,
+    "delta_q1_ours_vs_q1_base": {
+      "n": 200,
+      "delta": 0.065,
+      "ci95": [
+        -0.005,
+        0.135
+      ]
+    },
+    "delta_q1_online_vs_q1_base": {
+      "n": 200,
+      "delta": 0.045,
+      "ci95": [
+        -0.03,
+        0.12
+      ]
+    }
+  },
+  "ifeval": {
+    "n_common": 200,
+    "q4_1.7b_base": null,
+    "q1_base": 0.64,
+    "q1_ours": 0.64,
+    "q4_base": null,
+    "q1_online": {
+      "adapter": "q1+online-ifeval-tulu",
+      "score": 0.63
+    },
+    "q4_online": null,
+    "q4_bonsai_adapter": null,
+    "delta_q1_ours_vs_q1_base": {
+      "n": 200,
+      "delta": 0.0,
+      "ci95": [
+        -0.045,
+        0.04
+      ]
+    },
+    "delta_q1_online_vs_q1_base": {
+      "n": 200,
+      "delta": -0.01,
+      "ci95": [
+        -0.05,
+        0.025
+      ]
+    }
+  }
+}

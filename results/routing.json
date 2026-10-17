@@ -1,0 +1,520 @@
+{
+  "params": 72276,
+  "views": {
+    "full": {
+      "gamma_arbitration": 0.2,
+      "gamma_membrane": 0.0,
+      "n_e2e_per_env": {
+        "reverse-text": 200,
+        "medmcqa": 200,
+        "ifeval": 200,
+        "gsm8k": 200
+      },
+      "policies": {
+        "trm": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "ldt": {
+          "route_acc_mean": 0.305,
+          "route_acc_min": 0.305,
+          "abstain_rate": 0.63,
+          "e2e_macro_mean": 0.5057,
+          "e2e_per_env": {
+            "reverse-text": 0.153,
+            "medmcqa": 0.39,
+            "ifeval": 0.635,
+            "gsm8k": 0.845
+          }
+        },
+        "soft": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "hard-filter": {
+          "route_acc_mean": 0.9347,
+          "route_acc_min": 0.9337,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.693,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.64,
+            "gsm8k": 0.875
+          }
+        },
+        "arbitration": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "membrane": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "trm-abstain": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "membrane (e2e-tuned)": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0003,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "trm-abstain (e2e-tuned)": {
+          "route_acc_mean": 0.9975,
+          "route_acc_min": 0.9938,
+          "abstain_rate": 0.0003,
+          "e2e_macro_mean": 0.6933,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.641,
+            "gsm8k": 0.875
+          }
+        },
+        "trm + expected-utility (Bayes)": {
+          "route_acc_mean": 0.643,
+          "route_acc_min": 0.6025,
+          "abstain_rate": 0.1263,
+          "e2e_macro_mean": 0.6843,
+          "e2e_per_env": {
+            "reverse-text": 0.8171,
+            "medmcqa": 0.44,
+            "ifeval": 0.645,
+            "gsm8k": 0.835
+          }
+        }
+      },
+      "refs": {
+        "oracle": {
+          "reverse-text": 0.8171459398828465,
+          "medmcqa": 0.44,
+          "ifeval": 0.64,
+          "gsm8k": 0.875
+        },
+        "no adapter": {
+          "reverse-text": 0.11547322102239573,
+          "medmcqa": 0.375,
+          "ifeval": 0.64,
+          "gsm8k": 0.845
+        },
+        "always reverse-text": {
+          "reverse-text": 0.8171459398828465,
+          "medmcqa": 0.25,
+          "ifeval": 0.33,
+          "gsm8k": 0.045
+        },
+        "always gsm8k": {
+          "reverse-text": 0.1309294893389593,
+          "medmcqa": 0.37,
+          "ifeval": 0.645,
+          "gsm8k": 0.875
+        },
+        "always medmcqa": {
+          "reverse-text": 0.13338289091504968,
+          "medmcqa": 0.44,
+          "ifeval": 0.63,
+          "gsm8k": 0.85
+        },
+        "always ifeval": {
+          "reverse-text": 0.13471556889859984,
+          "medmcqa": 0.34,
+          "ifeval": 0.64,
+          "gsm8k": 0.875
+        }
+      },
+      "e2e_tuned_gamma_picks": {
+        "membrane (e2e-tuned)": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.95
+          ],
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "trm-abstain (e2e-tuned)": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.99
+          ],
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ]
+      },
+      "confusion_seed0": {
+        "trm": {
+          "reverse-text": {
+            "reverse-text": 200
+          },
+          "gsm8k": {
+            "gsm8k": 200
+          },
+          "medmcqa": {
+            "medmcqa": 200
+          },
+          "ifeval": {
+            "ifeval": 199,
+            "gsm8k": 1
+          }
+        },
+        "trm + expected-utility (Bayes)": {
+          "reverse-text": {
+            "reverse-text": 200
+          },
+          "gsm8k": {
+            "abstain": 100,
+            "gsm8k": 100
+          },
+          "medmcqa": {
+            "medmcqa": 200
+          },
+          "ifeval": {
+            "gsm8k": 183,
+            "ifeval": 16,
+            "abstain": 1
+          }
+        }
+      }
+    },
+    "content": {
+      "gamma_arbitration": 0.0,
+      "gamma_membrane": 0.0,
+      "n_e2e_per_env": {
+        "reverse-text": 200,
+        "medmcqa": 200,
+        "ifeval": 200,
+        "gsm8k": 200
+      },
+      "policies": {
+        "trm": {
+          "route_acc_mean": 0.8652,
+          "route_acc_min": 0.8363,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6149,
+          "e2e_per_env": {
+            "reverse-text": 0.5747,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.823
+          }
+        },
+        "ldt": {
+          "route_acc_mean": 0.305,
+          "route_acc_min": 0.305,
+          "abstain_rate": 0.4263,
+          "e2e_macro_mean": 0.5066,
+          "e2e_per_env": {
+            "reverse-text": 0.1564,
+            "medmcqa": 0.39,
+            "ifeval": 0.635,
+            "gsm8k": 0.845
+          }
+        },
+        "soft": {
+          "route_acc_mean": 0.8652,
+          "route_acc_min": 0.8363,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6149,
+          "e2e_per_env": {
+            "reverse-text": 0.5747,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.823
+          }
+        },
+        "hard-filter": {
+          "route_acc_mean": 0.683,
+          "route_acc_min": 0.6663,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.5533,
+          "e2e_per_env": {
+            "reverse-text": 0.2832,
+            "medmcqa": 0.447,
+            "ifeval": 0.637,
+            "gsm8k": 0.846
+          }
+        },
+        "arbitration": {
+          "route_acc_mean": 0.8652,
+          "route_acc_min": 0.8363,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6149,
+          "e2e_per_env": {
+            "reverse-text": 0.5747,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.823
+          }
+        },
+        "membrane": {
+          "route_acc_mean": 0.8652,
+          "route_acc_min": 0.8363,
+          "abstain_rate": 0.0,
+          "e2e_macro_mean": 0.6149,
+          "e2e_per_env": {
+            "reverse-text": 0.5747,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.823
+          }
+        },
+        "trm-abstain": {
+          "route_acc_mean": 0.8648,
+          "route_acc_min": 0.8363,
+          "abstain_rate": 0.0022,
+          "e2e_macro_mean": 0.6147,
+          "e2e_per_env": {
+            "reverse-text": 0.5747,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.822
+          }
+        },
+        "membrane (e2e-tuned)": {
+          "route_acc_mean": 0.8623,
+          "route_acc_min": 0.835,
+          "abstain_rate": 0.0057,
+          "e2e_macro_mean": 0.6134,
+          "e2e_per_env": {
+            "reverse-text": 0.5664,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.825
+          }
+        },
+        "trm-abstain (e2e-tuned)": {
+          "route_acc_mean": 0.8633,
+          "route_acc_min": 0.8337,
+          "abstain_rate": 0.0057,
+          "e2e_macro_mean": 0.6137,
+          "e2e_per_env": {
+            "reverse-text": 0.5696,
+            "medmcqa": 0.437,
+            "ifeval": 0.625,
+            "gsm8k": 0.823
+          }
+        },
+        "trm + expected-utility (Bayes)": {
+          "route_acc_mean": 0.5703,
+          "route_acc_min": 0.5413,
+          "abstain_rate": 0.1283,
+          "e2e_macro_mean": 0.6032,
+          "e2e_per_env": {
+            "reverse-text": 0.5718,
+            "medmcqa": 0.433,
+            "ifeval": 0.627,
+            "gsm8k": 0.781
+          }
+        }
+      },
+      "refs": {
+        "oracle": {
+          "reverse-text": 0.8171459398828465,
+          "medmcqa": 0.44,
+          "ifeval": 0.64,
+          "gsm8k": 0.875
+        },
+        "no adapter": {
+          "reverse-text": 0.11547322102239573,
+          "medmcqa": 0.375,
+          "ifeval": 0.64,
+          "gsm8k": 0.845
+        },
+        "always reverse-text": {
+          "reverse-text": 0.8171459398828465,
+          "medmcqa": 0.25,
+          "ifeval": 0.33,
+          "gsm8k": 0.045
+        },
+        "always gsm8k": {
+          "reverse-text": 0.1309294893389593,
+          "medmcqa": 0.37,
+          "ifeval": 0.645,
+          "gsm8k": 0.875
+        },
+        "always medmcqa": {
+          "reverse-text": 0.13338289091504968,
+          "medmcqa": 0.44,
+          "ifeval": 0.63,
+          "gsm8k": 0.85
+        },
+        "always ifeval": {
+          "reverse-text": 0.13471556889859984,
+          "medmcqa": 0.34,
+          "ifeval": 0.64,
+          "gsm8k": 0.875
+        }
+      },
+      "e2e_tuned_gamma_picks": {
+        "membrane (e2e-tuned)": [
+          [
+            0.99,
+            0.0
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.5
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "trm-abstain (e2e-tuned)": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.8
+          ],
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.7
+          ],
+          [
+            0.0,
+            0.6
+          ]
+        ]
+      },
+      "confusion_seed0": {
+        "trm": {
+          "reverse-text": {
+            "reverse-text": 135,
+            "gsm8k": 22,
+            "ifeval": 35,
+            "medmcqa": 8
+          },
+          "gsm8k": {
+            "gsm8k": 185,
+            "reverse-text": 8,
+            "ifeval": 7
+          },
+          "medmcqa": {
+            "medmcqa": 200
+          },
+          "ifeval": {
+            "ifeval": 184,
+            "reverse-text": 13,
+            "gsm8k": 2,
+            "medmcqa": 1
+          }
+        },
+        "trm + expected-utility (Bayes)": {
+          "reverse-text": {
+            "reverse-text": 136,
+            "ifeval": 29,
+            "abstain": 11,
+            "medmcqa": 8,
+            "gsm8k": 16
+          },
+          "gsm8k": {
+            "abstain": 90,
+            "gsm8k": 46,
+            "ifeval": 56,
+            "reverse-text": 8
+          },
+          "medmcqa": {
+            "medmcqa": 199,
+            "reverse-text": 1
+          },
+          "ifeval": {
+            "ifeval": 98,
+            "gsm8k": 87,
+            "reverse-text": 14,
+            "abstain": 1
+          }
+        }
+      }
+    }
+  }
+}

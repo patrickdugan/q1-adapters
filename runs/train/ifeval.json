@@ -1,0 +1,70 @@
+{
+  "env": "ifeval",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\rft\\ifeval-q1-base.jsonl"
+  ],
+  "n_samples": 1600,
+  "n_selected": 482,
+  "n_train_items": 479,
+  "skipped_over_max_len": 3,
+  "min_score": 1.0,
+  "per_prompt": 2,
+  "epochs": 2.0,
+  "lr": 0.0001,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 60,
+  "train_wall_s": 4801,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 0.3682
+    },
+    {
+      "step": 10,
+      "loss": 0.2971
+    },
+    {
+      "step": 15,
+      "loss": 0.2876
+    },
+    {
+      "step": 20,
+      "loss": 0.3101
+    },
+    {
+      "step": 25,
+      "loss": 0.2985
+    },
+    {
+      "step": 30,
+      "loss": 0.2636
+    },
+    {
+      "step": 35,
+      "loss": 0.2604
+    },
+    {
+      "step": 40,
+      "loss": 0.237
+    },
+    {
+      "step": 45,
+      "loss": 0.2284
+    },
+    {
+      "step": 50,
+      "loss": 0.2524
+    },
+    {
+      "step": 55,
+      "loss": 0.2325
+    },
+    {
+      "step": 60,
+      "loss": 0.2188
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\ifeval",
+  "gguf_bytes": 87328896
+}

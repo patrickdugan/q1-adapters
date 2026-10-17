@@ -1,0 +1,27 @@
+{
+  "env": "gsm8k",
+  "split": "eval",
+  "label": "q1+ours:medmcqa",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.85,
+  "score_ci95": 0.0496,
+  "reward_mean": 0.85,
+  "metrics_mean": {
+    "correct": 0.85
+  },
+  "completion_tokens_mean": 273.2,
+  "truncated_frac": 0.01,
+  "wall_s_this_run": 180.9,
+  "agg_tokens_per_s_this_run": 302.0,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 768,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8097/v1"
+}

@@ -9,9 +9,9 @@ $loras = @($Online.Values)
 $ours = @($envs | Where-Object { Test-Path "$W\$_\lora-f16.gguf" })
 $names += @($ours | ForEach-Object { "ours-$_" })
 $loras += @($ours | ForEach-Object { "$W\$_\lora-f16.gguf" })
-WaitGpu 14000
+WaitGpu 11000
 Log 'phase D: start Q4 server with online + our adapters (init without apply)'
-& "$R\harness\serve.ps1" -Name q4 -Model $Q4 -Lora $loras -Port 8096 -Np 6 -Ctx 49152 -LoraInitWithoutApply | ForEach-Object { Log $_ }
+& "$R\harness\serve.ps1" -Name q4 -Model $Q4 -Lora $loras -Port 8096 -Np 4 -Ctx 32768 -LoraInitWithoutApply | ForEach-Object { Log $_ }
 $off = @(for ($i = 0; $i -lt $names.Count; $i++) { 0.0 })
 Log ("lora scales: " + (SetLora 8096 $off))
 foreach ($e in $envs) { Gen $e 'q4-base' "$R\results\$e\q4-base" }
@@ -30,7 +30,7 @@ StopServer 8096
 $Q4s = 'C:\Users\patri\Documents\Codex\models\gguf\Qwen3-1.7B-Q4_K_M.gguf'
 if (Test-Path $Q4s) {
     Log 'phase D: start Qwen3-1.7B Q4_K_M server'
-    & "$R\harness\serve.ps1" -Name q4-1.7b -Model $Q4s -Port 8096 -Np 6 -Ctx 49152 | ForEach-Object { Log $_ }
+    & "$R\harness\serve.ps1" -Name q4-1.7b -Model $Q4s -Port 8096 -Np 4 -Ctx 32768 | ForEach-Object { Log $_ }
     foreach ($e in $envs) { Gen $e 'q4-1.7b-base' "$R\results\$e\q4-1.7b-base" }
     StopServer 8096
 }

@@ -1,0 +1,27 @@
+{
+  "env": "ifeval",
+  "split": "eval",
+  "label": "q1+ours",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.64,
+  "score_ci95": 0.0667,
+  "reward_mean": 0.64,
+  "metrics_mean": {
+    "ifeval_reward_func": 0.64
+  },
+  "completion_tokens_mean": 301.1,
+  "truncated_frac": 0.165,
+  "wall_s_this_run": 361.7,
+  "agg_tokens_per_s_this_run": 166.5,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 1024,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

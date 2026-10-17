@@ -67,16 +67,25 @@ def best_online(env: str, prefix: str):
 
 def main() -> int:
     summary, lines = {}, []
-    lines.append("| env (metric) | Q4 1.7B base (1.11 GB) | Q1 8B base (1.16 GB) | Q1 + our adapter (1.25 GB) | "
+    lines.append("| env (metric) | n | Q4 1.7B base (1.11 GB) | Q1 8B base (1.16 GB) | Q1 + our adapter (1.25 GB) | "
                  "Q1 + online Qwen3 adapter | Q4 8B base (5.03 GB) | Q4 8B + online adapter (5.11 GB) | Q4 8B + our Bonsai adapter |")
-    lines.append("|---|---|---|---|---|---|---|---|")
+    lines.append("|---|---|---|---|---|---|---|---|---|")
     pts = []
     for env in ENVS:
         q1b, q1o, q4b = load(env, "q1-base"), load(env, "q1+ours"), load(env, "q4-base")
         q4s = load(env, "q4-1.7b-base")
         q1on, q4on = best_online(env, "q1+"), best_online(env, "q4+")
         q4ours = load(env, "q4+bonsai-adapter")
-        row = {"q4_1.7b_base": q4s and mean(q4s), "q1_base": q1b and mean(q1b), "q1_ours": q1o and mean(q1o),
+        # every cell of a row is averaged over the SAME examples: the ids all its configurations answered
+        present = [d for d in (q1b, q1o, q4b, q4s, q4ours, q1on and q1on[1], q4on and q4on[1]) if d]
+        common = set.intersection(*(set(d) for d in present)) if present else set()
+
+        def cut(d):
+            return d and {k: v for k, v in d.items() if k in common}
+        q1b, q1o, q4b, q4s, q4ours = cut(q1b), cut(q1o), cut(q4b), cut(q4s), cut(q4ours)
+        q1on = q1on and (q1on[0], cut(q1on[1]))
+        q4on = q4on and (q4on[0], cut(q4on[1]))
+        row = {"n_common": len(common), "q4_1.7b_base": q4s and mean(q4s), "q1_base": q1b and mean(q1b), "q1_ours": q1o and mean(q1o),
                "q4_base": q4b and mean(q4b),
                "q1_online": q1on and {"adapter": q1on[0], "score": mean(q1on[1])},
                "q4_online": q4on and {"adapter": q4on[0], "score": mean(q4on[1])},
@@ -100,7 +109,7 @@ def main() -> int:
 
         def fo(o):
             return "—" if not o else f"{mean(o[1]):.3f} ({o[0].split('online-')[-1]})"
-        lines.append(f"| {env} ({METRIC[env]}) | {f(row['q4_1.7b_base'])} | {f(row['q1_base'])} | {f(row['q1_ours'])} | "
+        lines.append(f"| {env} ({METRIC[env]}) | {row['n_common']} | {f(row['q4_1.7b_base'])} | {f(row['q1_base'])} | {f(row['q1_ours'])} | "
                      f"{fo(q1on)} | {f(row['q4_base'])} | {fo(q4on)} | {f(row['q4_bonsai_adapter'])} |")
         for lab, val, mem in [("Q4 1.7B base", row["q4_1.7b_base"], Q4S_BYTES),
                               ("Q1 base", row["q1_base"], Q1_BYTES), ("Q1 + adapter", row["q1_ours"], Q1_BYTES + LORA_BYTES),

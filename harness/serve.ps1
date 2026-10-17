@@ -30,7 +30,8 @@ Get-ChildItem $srvDir -Filter '*.json' | ForEach-Object {
 function UsedMiB { [int](nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits) }
 $before = UsedMiB
 $argList = @('-m', $Model, '--port', "$Port", '--host', '127.0.0.1', '-ngl', '99', '-c', "$Ctx", '--parallel', "$Np",
-             '--jinja', '--chat-template-file', $tmpl, '--metrics')
+             '--jinja', '--chat-template-file', $tmpl, '--metrics',
+             '--cache-ram', '1024')  # host prompt cache defaults to 8 GiB of RAM; the eval prompts barely reuse prefixes
 foreach ($l in $Lora) { $argList += @('--lora', $l) }
 if ($LoraInitWithoutApply) { $argList += '--lora-init-without-apply' }
 $log = Join-Path $srvDir "$Name.log"

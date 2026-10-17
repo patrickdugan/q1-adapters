@@ -1,0 +1,142 @@
+{
+  "env": "reverse-text",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\sft\\reverse-text-gold.jsonl"
+  ],
+  "n_samples": 800,
+  "n_selected": 800,
+  "n_train_items": 800,
+  "skipped_over_max_len": 0,
+  "min_score": 0.99,
+  "per_prompt": 1,
+  "epochs": 3.0,
+  "lr": 0.0002,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 150,
+  "train_wall_s": 417,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 5.1609
+    },
+    {
+      "step": 10,
+      "loss": 4.0955
+    },
+    {
+      "step": 15,
+      "loss": 3.1589
+    },
+    {
+      "step": 20,
+      "loss": 2.952
+    },
+    {
+      "step": 25,
+      "loss": 2.2727
+    },
+    {
+      "step": 30,
+      "loss": 2.3377
+    },
+    {
+      "step": 35,
+      "loss": 1.9065
+    },
+    {
+      "step": 40,
+      "loss": 1.824
+    },
+    {
+      "step": 45,
+      "loss": 1.771
+    },
+    {
+      "step": 50,
+      "loss": 1.4133
+    },
+    {
+      "step": 55,
+      "loss": 1.411
+    },
+    {
+      "step": 60,
+      "loss": 1.23
+    },
+    {
+      "step": 65,
+      "loss": 1.062
+    },
+    {
+      "step": 70,
+      "loss": 1.0885
+    },
+    {
+      "step": 75,
+      "loss": 0.8976
+    },
+    {
+      "step": 80,
+      "loss": 1.0611
+    },
+    {
+      "step": 85,
+      "loss": 0.8705
+    },
+    {
+      "step": 90,
+      "loss": 0.9528
+    },
+    {
+      "step": 95,
+      "loss": 0.8774
+    },
+    {
+      "step": 100,
+      "loss": 0.7094
+    },
+    {
+      "step": 105,
+      "loss": 0.7521
+    },
+    {
+      "step": 110,
+      "loss": 0.5532
+    },
+    {
+      "step": 115,
+      "loss": 0.5579
+    },
+    {
+      "step": 120,
+      "loss": 0.5798
+    },
+    {
+      "step": 125,
+      "loss": 0.4649
+    },
+    {
+      "step": 130,
+      "loss": 0.6409
+    },
+    {
+      "step": 135,
+      "loss": 0.4464
+    },
+    {
+      "step": 140,
+      "loss": 0.6062
+    },
+    {
+      "step": 145,
+      "loss": 0.5937
+    },
+    {
+      "step": 150,
+      "loss": 0.446
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\reverse-text",
+  "gguf_bytes": 87328928
+}

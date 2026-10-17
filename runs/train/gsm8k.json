@@ -1,0 +1,98 @@
+{
+  "env": "gsm8k",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\rft\\gsm8k-q1-base.jsonl"
+  ],
+  "n_samples": 1600,
+  "n_selected": 757,
+  "n_train_items": 757,
+  "skipped_over_max_len": 0,
+  "min_score": 1.0,
+  "per_prompt": 2,
+  "epochs": 2.0,
+  "lr": 0.0001,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 96,
+  "train_wall_s": 2994,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 0.1162
+    },
+    {
+      "step": 10,
+      "loss": 0.1066
+    },
+    {
+      "step": 15,
+      "loss": 0.1082
+    },
+    {
+      "step": 20,
+      "loss": 0.1024
+    },
+    {
+      "step": 25,
+      "loss": 0.0972
+    },
+    {
+      "step": 30,
+      "loss": 0.0975
+    },
+    {
+      "step": 35,
+      "loss": 0.101
+    },
+    {
+      "step": 40,
+      "loss": 0.0919
+    },
+    {
+      "step": 45,
+      "loss": 0.0985
+    },
+    {
+      "step": 50,
+      "loss": 0.1017
+    },
+    {
+      "step": 55,
+      "loss": 0.0845
+    },
+    {
+      "step": 60,
+      "loss": 0.0875
+    },
+    {
+      "step": 65,
+      "loss": 0.0907
+    },
+    {
+      "step": 70,
+      "loss": 0.0732
+    },
+    {
+      "step": 75,
+      "loss": 0.083
+    },
+    {
+      "step": 80,
+      "loss": 0.0839
+    },
+    {
+      "step": 85,
+      "loss": 0.0855
+    },
+    {
+      "step": 90,
+      "loss": 0.0785
+    },
+    {
+      "step": 95,
+      "loss": 0.0815
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\gsm8k",
+  "gguf_bytes": 87328896
+}

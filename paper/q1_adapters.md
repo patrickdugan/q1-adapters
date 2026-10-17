@@ -69,4 +69,106 @@ Max new tokens: 384 (reverse-text), 768 (gsm8k), 1024 (medmcqa, ifeval).
 (`--lora-init-without-apply`) and switched per run through `/lora-adapters` — the deployment
 pattern where one small base serves many skills.
 
-<!-- RESULTS -->
+**Routers.** A skill library needs a router. Following the TRM/LDT split of Dugan (2026,
+*Trade-offs between TRM/LDT hybrids*), we compare a **TRM** — a tiny recursive classifier
+(72k parameters: hashed word/bigram/char-trigram features, a latent *z* and answer state *y*
+refined by two weight-shared 2-layer MLPs, 3 inner × 3 outer steps, deep supervision) — with an
+**LDT** lexical lattice (each known word carries the candidate set of envs it occurs in; a
+prompt's state is the meet over its words; the empty set is bottom), and the paper's hybrid control
+policies: soft (lattice as telemetry), hard filter, confidence arbitration, and a typed membrane
+that **abstains to the base model** when the TRM's proposal conflicts with the lattice. Routers are
+trained on 800 train prompts per env and scored on the 800 eval prompts in two views: the full
+prompt as the env sends it, and the user's content with the env's instruction scaffolding removed.
+Besides routing accuracy we report **end-to-end** score: the env score of the answer the 1-bit model
+actually produced under the chosen adapter (all adapter × env answers are generated, so this is a
+lookup, not a model of the outcome).
+
+## 3. Results
+
+<!-- MAIN TABLE -->
+
+### 3.2 What an 87 MB adapter buys on the 1-bit base
+
+Paired deltas over the same 200 examples and seeds (bootstrap 95% CI):
+
+| env | Q1 base | Q1 + our adapter | Δ | what the adapter learned |
+|---|---|---|---|---|
+| reverse-text | 0.115 | **0.817** | **+0.702** [+0.682, +0.722] | the task itself: the base reorders words instead of reversing characters and runs past the 384-token cap on half the items (mean 205 tokens, 49% truncated); with the adapter, 51 tokens, 0% truncated |
+| gsm8k | 0.845 | 0.875 | +0.030 [−0.020, +0.075] | sharpening only — self-distillation on its own correct answers (loss 0.12 → 0.08) |
+| medmcqa | 0.375 | 0.440 | +0.065 [−0.005, +0.135] | modest; borderline at n = 200 (500-example extension in §3.6) |
+| ifeval | 0.640 | 0.640 | 0.000 [−0.045, +0.040] | nothing measurable |
+
+The pattern is what one would predict for rejection-sampling fine-tuning: it can only amplify
+behaviour the base already samples. Where the base is far from the task (reverse-text) a few
+hundred gold examples move it by 0.7; where it already samples correct answers most of the time
+(gsm8k 91% of training samples correct) there is little left to amplify.
+
+**Training cost** (RTX 5080 Laptop, 16 GB; the QLoRA job sat at the VRAM limit, so these are
+upper bounds):
+
+| adapter | data | sampling (Q1 server) | training | total |
+|---|---|---|---|---|
+| reverse-text | 800 env gold reversals | — | 7 min (150 steps) | 7 min |
+| gsm8k | 757 of 1,600 samples correct | 17 min | 50 min (96 steps) | 67 min |
+| medmcqa | 465 of 1,600 | 16 min | 60 min (60 steps) | 76 min |
+| ifeval | 479 of 1,600 | 23 min | 80 min (60 steps) | 103 min |
+
+### 3.3 Public Qwen3-8B adapters run on the 1-bit model
+
+Bonsai shares Qwen3-8B's architecture, so rank-16 LoRAs trained on Qwen3-8B load onto the 1-bit
+weights unchanged. They change every output (0/200 texts identical to base on gsm8k and medmcqa,
+33/200 on ifeval) but their effect is within noise at n = 200: gsm8k GRPO adapter +0.025
+[−0.025, +0.075], MetaMathQA −0.005, MedMCQA adapter +0.045 [−0.030, +0.120], Tulu IF adapter
+−0.010 [−0.050, +0.025]. They neither break the 1-bit model nor reliably help it.
+
+### 3.4 Adapters are narrow — and one is dangerous off-task
+
+Every adapter on every env (1-bit base, 200 examples per cell; rows = env, columns = adapter):
+
+| env | no adapter | reverse-text | gsm8k | medmcqa | ifeval |
+|---|---|---|---|---|---|
+| reverse-text | 0.115 | **0.817** | 0.131 | 0.133 | 0.135 |
+| gsm8k | 0.845 | **0.045** | **0.875** | 0.850 | 0.875 |
+| medmcqa | 0.375 | **0.250** | 0.370 | **0.440** | 0.340 |
+| ifeval | 0.640 | **0.330** | 0.645 | 0.630 | **0.640** |
+
+The three self-distilled adapters are close to harmless off-task. The reverse-text adapter — the
+one that learned a genuinely new behaviour — destroys the others (gsm8k 0.845 → 0.045: it starts
+reversing). A skill library on one base is therefore only as good as its router.
+
+### 3.5 Routing the library: TRM, LDT and hybrids
+
+End-to-end macro score (mean over the four envs of the score of the answer actually produced under
+the routed adapter; 800 prompts, TRM averaged over 5 seeds):
+
+| router | full prompt: routing acc | full: end-to-end | content only: routing acc | content: end-to-end |
+|---|---|---|---|---|
+| oracle (true env's adapter) | 1.000 | 0.693 | 1.000 | 0.693 |
+| no adapter (base) | — | 0.494 | — | 0.494 |
+| best single adapter for everything (medmcqa) | — | 0.513 | — | 0.513 |
+| **TRM** (72k parameters) | 0.998 | **0.693** | 0.865 | **0.615** |
+| LDT alone (lexical lattice; bottom → base) | 0.305 | 0.506 | 0.305 | 0.507 |
+| hard-filter hybrid | 0.935 | 0.693 | 0.683 | 0.553 |
+| soft hybrid / confidence arbitration / membrane (γ by CV) | = TRM | 0.693 | = TRM | 0.615 |
+| membrane, abstain threshold tuned end-to-end (cross-fitted) | 0.998 | 0.693 | 0.862 | 0.613 |
+| TRM + expected-utility over the cross-task matrix (cross-fitted) | 0.643 | 0.684 | 0.570 | 0.603 |
+
+Findings, which replicate the routing ablation of the TRM/LDT hybrid paper on a new problem:
+
+1. **A 72k-parameter TRM is enough when the prompt carries the task**: it matches the oracle
+   (0.693), turning four 87 MB adapters into +0.20 macro score over the base model, while no single
+   adapter gets more than +0.02.
+2. **Lexical lattice evidence is too noisy to filter with.** The LDT alone reaches bottom on most
+   prompts (abstains 43–63%), and using it as a hard filter costs 0.06 end-to-end on content-only
+   prompts — the same failure mode as the paper's routing benchmark (0.584 vs 0.815). As soft
+   telemetry it is harmless and inert.
+3. **Abstention does not rescue content-only routing here.** The errors are bare sentences
+   (reverse-text items) routed to other adapters, and for those the base model is no better than a
+   wrong adapter (0.115), so abstaining gains nothing; the costly error (a math problem sent to
+   the reverse-text adapter) is rare (8/200). Expected-utility routing over the measured cross-task
+   matrix is *worse* (0.603): off-task, three adapters are near-ties, and the decision chases noise
+   in the estimated matrix.
+
+<!-- Q4 COMPARISON -->
+
+<!-- SYSTEMS -->

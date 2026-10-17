@@ -1,0 +1,70 @@
+{
+  "env": "medmcqa",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\rft\\medmcqa-q1-base.jsonl"
+  ],
+  "n_samples": 1600,
+  "n_selected": 465,
+  "n_train_items": 465,
+  "skipped_over_max_len": 0,
+  "min_score": 1.0,
+  "per_prompt": 2,
+  "epochs": 2.0,
+  "lr": 0.0001,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 60,
+  "train_wall_s": 3572,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 0.3055
+    },
+    {
+      "step": 10,
+      "loss": 0.2955
+    },
+    {
+      "step": 15,
+      "loss": 0.2777
+    },
+    {
+      "step": 20,
+      "loss": 0.2585
+    },
+    {
+      "step": 25,
+      "loss": 0.2767
+    },
+    {
+      "step": 30,
+      "loss": 0.2532
+    },
+    {
+      "step": 35,
+      "loss": 0.2469
+    },
+    {
+      "step": 40,
+      "loss": 0.2399
+    },
+    {
+      "step": 45,
+      "loss": 0.2297
+    },
+    {
+      "step": 50,
+      "loss": 0.2309
+    },
+    {
+      "step": 55,
+      "loss": 0.2283
+    },
+    {
+      "step": 60,
+      "loss": 0.2021
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\medmcqa",
+  "gguf_bytes": 87328928
+}

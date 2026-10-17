@@ -1,0 +1,27 @@
+{
+  "env": "reverse-text",
+  "split": "eval",
+  "label": "q1-base",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.1155,
+  "score_ci95": 0.0183,
+  "reward_mean": 0.1155,
+  "metrics_mean": {
+    "lcs_reward_func": 0.1155
+  },
+  "completion_tokens_mean": 204.9,
+  "truncated_frac": 0.49,
+  "wall_s_this_run": 102.9,
+  "agg_tokens_per_s_this_run": 398.3,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 384,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

@@ -1,0 +1,29 @@
+{
+  "env": "medmcqa",
+  "split": "eval",
+  "label": "q1+ours",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.44,
+  "score_ci95": 0.069,
+  "reward_mean": 0.4679,
+  "metrics_mean": {
+    "accuracy_reward": 0.44,
+    "thinking_reward": 0.2995,
+    "boxed_reward": 1.0
+  },
+  "completion_tokens_mean": 234.4,
+  "truncated_frac": 0.0,
+  "wall_s_this_run": 256.3,
+  "agg_tokens_per_s_this_run": 182.9,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 1024,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}
