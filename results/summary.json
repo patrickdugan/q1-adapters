@@ -271,6 +271,7 @@
       "q1-base": 0.388,
       "q1+ours": 0.45,
       "q1+online-medmcqa-vireshk": 0.408,
+      "q4-base": 0.518,
       "delta q1+ours vs q1-base": {
         "n": 500,
         "delta": 0.062,
@@ -293,6 +294,14 @@
         "ci95": [
           0.01,
           0.106
+        ]
+      },
+      "delta q1+ours vs q4-base": {
+        "n": 500,
+        "delta": -0.068,
+        "ci95": [
+          -0.122,
+          -0.014
         ]
       }
     }

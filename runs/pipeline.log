@@ -176,3 +176,8 @@
 [10-17 21:12:51] reverse-text q4-1.7b-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "reverse-text", "label": "q4-1.7b-base", "n_samples": 200, "score_mean": 0.0785, "score_ci95": 0.0171, "reward_mean": 0.0785, "completion_tokens_mean": 269.2, "truncated_frac": 0.67, "agg_tokens_per_s_this_run": 595.3} (102s)
 [10-17 21:12:56] chainF: done
 [10-17 21:13:54] server q4-ext3-0 pid=11052 port=8096 vram_delta=9316 MiB
+[10-17 21:17:54] medmcqa q4-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4-base", "n_samples": 500, "score_mean": 0.518, "score_ci95": 0.0438, "reward_mean": 0.5042, "completion_tokens_mean": 242.8, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 537.9} (239s)
+[10-17 21:22:12] peft check gsm8k nf4-base: {"file": "gsm8k.nf4-base.jsonl", "n": 60, "score": 0.967, "stutter": 2}
+[10-17 21:25:53] peft check gsm8k nf4-metamath: {"file": "gsm8k.nf4-metamath.jsonl", "n": 60, "score": 0.85, "stutter": 0}
+[10-17 21:38:01] peft check gsm8k nf4-grpo: {"file": "gsm8k.nf4-grpo.jsonl", "n": 60, "score": 0.833, "stutter": 18}
+[10-17 21:38:06] chainG: done

@@ -37,10 +37,11 @@ Extended evaluation, 500 examples (configurations run to 500; each row averaged 
 - gsm8k (n=500) Q1 base vs Q4 1.7B base: +0.052 [+0.014, +0.088]
 - gsm8k (n=500) Q1 + our adapter vs Q4 1.7B base: +0.066 [+0.032, +0.102]
 - gsm8k (n=500) Q1 + our adapter vs Q4 8B base: -0.070 [-0.096, -0.046]
-| medmcqa | 500 | 0.392 | 0.388 | 0.450 | — | — | 0.408 | — |
+| medmcqa | 500 | 0.392 | 0.388 | 0.450 | — | — | 0.408 | 0.518 |
 - medmcqa (n=500) Q1 + our adapter vs Q1 base: +0.062 [+0.018, +0.108]
 - medmcqa (n=500) Q1 base vs Q4 1.7B base: -0.004 [-0.048, +0.044]
 - medmcqa (n=500) Q1 + our adapter vs Q4 1.7B base: +0.058 [+0.010, +0.106]
+- medmcqa (n=500) Q1 + our adapter vs Q4 8B base: -0.068 [-0.122, -0.014]
 
 llama-bench (PrismML fork build 10743; GPU = RTX 5080 Laptop, -ngl 99; CPU = 8 threads):
 
@@ -100,7 +101,7 @@ Served throughput during the eval runs (6 concurrent requests, aggregate decode 
 | medmcqa | q4+bonsai-adapter | 101 |
 | medmcqa | q4+online:medmcqa-vireshk | 71 |
 | medmcqa | q4-1.7b-base | 622 |
-| medmcqa | q4-base | 20 |
+| medmcqa | q4-base | 538 |
 | ifeval | q1+ours:gsm8k | 270 |
 | ifeval | q1+ours:medmcqa | 287 |
 | ifeval | q1+ours:reverse-text | 244 |

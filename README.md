@@ -4,7 +4,23 @@ Task LoRAs on a natively 1-bit 8B model (PrismML **Bonsai 8B**, `Q1_0`, 1.16 GB)
 **Prime Intellect Environments Hub** rewards on one laptop GPU, benchmarked against a 4-bit
 **Qwen3-8B** (`Q4_K_M`, 5.03 GB) carrying community adapters found on the Hugging Face Hub.
 
-Paper draft: [`paper/q1_adapters.md`](paper/q1_adapters.md). Tables: [`results/tables.md`](results/tables.md).
+Paper draft: [`paper/q1_adapters.md`](paper/q1_adapters.md). Tables: [`results/tables.md`](results/tables.md),
+routing: [`results/routing.md`](results/routing.md).
+
+Headline (200 items per env; GSM8K/MedMCQA also at 500):
+
+| | Q4 Qwen3-1.7B (1.11 GB) | Q1 Bonsai 8B (1.16 GB) | Q1 + routed adapters (+4×87 MB) | Q4 Qwen3-8B (5.03 GB) |
+|---|---|---|---|---|
+| reverse-text | 0.079 | 0.115 | **0.817** | 0.178 |
+| gsm8k | 0.800 | 0.845 | 0.875 | **0.945** |
+| medmcqa | 0.425 | 0.375 | 0.440 | **0.515** |
+| ifeval | 0.590 | 0.640 | 0.640 | **0.680** |
+| macro | 0.474 | 0.494 | **0.693** | 0.580 |
+| GPU decode | 320 tok/s | 201 tok/s | — | 89 tok/s |
+
+Also: a 72k-parameter TRM router dispatches the adapters at oracle level on full prompts; lexical LDT
+lattices hurt as hard filters; and public Qwen3-8B LoRAs collapse on llama.cpp `Q4_K_M` GGUFs while
+working on `Q8_0` and on NF4 + PEFT.
 
 ## Environments (scored by the env packages' own reward code)
 

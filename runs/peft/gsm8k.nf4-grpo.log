@@ -1,0 +1,25 @@
+﻿python.exe : `torch_dtype` is deprecated! Use `dtype` instead!
+At C:\Users\patri\OneDrive\Documents\GitHub\q1-adapters\harness\chainG.ps1:29 char:5
++     & $TorchPy -X utf8 "$R\harness\peft_check.py" generate --prompts  ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (`torch_dtype` i...dtype` instead!:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
+Loading checkpoint shards:  20%|██        | 1/5 [00:06<00:24,  6.01s/it]
+Loading checkpoint shards:  40%|████      | 2/5 [00:14<00:21,  7.26s/it]
+Loading checkpoint shards:  60%|██████    | 3/5 [00:21<00:14,  7.44s/it]
+Loading checkpoint shards:  80%|████████  | 4/5 [00:28<00:07,  7.07s/it]
+Loading checkpoint shards: 100%|██████████| 5/5 [00:29<00:00,  5.12s/it]
+Loading checkpoint shards: 100%|██████████| 5/5 [00:29<00:00,  5.99s/it]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set 
+`TRANSFORMERS_VERBOSITY=info` for more details.
+  8/60
+  16/60
+  24/60
+  32/60
+  40/60
+  48/60
+  56/60
+  60/60

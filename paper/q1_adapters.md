@@ -18,10 +18,11 @@ the time from the prompt, and the routed four-skill library scores a macro 0.693
 the 4-bit 8B — in 2.4 GiB of VRAM instead of 5.2 GiB — though on the three tasks the 4-bit model can already
 do, it stays ahead. A lexical lattice router (LDT) used as a hard filter hurts, reproducing the
 TRM/LDT hybrid result. The 1-bit model decodes 2.25× faster than the 4-bit 8B on the same GPU.
-Finally, the public Qwen3-8B adapters we found **collapse when served on the 4-bit `Q4_K_M` model**
-(MetaMathQA: GSM8K 0.98 → 0.37) yet reproduce their authors' numbers on `Q8_0` (0.87), while adapters
-trained against Bonsai's exact served weights show no such failure — a deployment hazard the 1-bit
-route avoids by construction. The price of 1 bit: adapters cannot be merged into the weights, so an
+Finally, the public Qwen3-8B adapters we found **collapse when served with llama.cpp on the 4-bit
+`Q4_K_M` GGUF** (MetaMathQA: GSM8K 0.98 → 0.37), yet the same adapter reproduces its author's number on
+llama.cpp `Q8_0` (0.87) and on 4-bit NF4 in transformers+PEFT (0.85); adapters trained against Bonsai's
+exact served weights show no such failure — a deployment hazard the 1-bit route avoids by
+construction. The price of 1 bit: adapters cannot be merged into the weights, so an
 active adapter roughly halves served throughput.
 
 ## 1. Question
@@ -29,8 +30,8 @@ active adapter roughly halves served throughput.
 A 4-bit 8B model is the usual "runs on a laptop" configuration: about 5 GB of weights. PrismML's
 **Bonsai 8B** has end-to-end 1-bit weights — embeddings, attention, MLP and LM head — on the
 Qwen3-8B dense architecture: `Q1_0` stores one sign bit per weight plus one FP16 scale per group of
-128 (1.125 bits/weight, 1.16 GB). PrismML reports GSM8K 88 and IFEval 79.8 for it (EvalScope, vLLM,
-thinking settings per their card; Apache-2.0). A 1-bit model is weaker out of the box, so the question is not "is Q1 as good as Q4"
+128 (1.125 bits/weight, 1.16 GB). PrismML's model card reports GSM8K 88 and IFEval 79.8 (EvalScope
+with vLLM on an H100; license Apache-2.0). A 1-bit model is weaker out of the box, so the question is not "is Q1 as good as Q4"
 but **what Q1 buys once you add the cheapest specialization available — a small task LoRA — and how
 that compares with the 4-bit model plus the adapters people already publish.**
 
@@ -130,9 +131,12 @@ GSM8K and MedMCQA, extended to 500 items (paired bootstrap 95% CIs):
 | env | Q4 1.7B | Q1 base | Q1 + our adapter | Q4 8B | Q1 + adapter vs Q1 | Q1 vs Q4 1.7B | Q1 + adapter vs Q4 1.7B | Q1 + adapter vs Q4 8B |
 |---|---|---|---|---|---|---|---|---|
 | gsm8k | 0.802 | 0.854 | 0.868 | 0.938 | +0.014 [−0.014, +0.044] | **+0.052** [+0.014, +0.088] | **+0.066** [+0.032, +0.102] | **−0.070** [−0.096, −0.046] |
-| medmcqa | 0.392 | 0.388 | 0.450 | <!-- Q4 MEDMCQA 500 --> | **+0.062** [+0.018, +0.108] | −0.004 [−0.048, +0.044] | **+0.058** [+0.010, +0.106] | <!-- Q4 MEDMCQA DELTA --> |
+| medmcqa | 0.392 | 0.388 | 0.450 | 0.518 | **+0.062** [+0.018, +0.108] | −0.004 [−0.048, +0.044] | **+0.058** [+0.010, +0.106] | **−0.068** [−0.122, −0.014] |
 
 ![score vs memory](../results/figures/score_vs_memory.png)
+
+*Score against weight size, 200-item values. On MedMCQA the 200-item sample puts the 4-bit 1.7B above
+the 1-bit base (0.425 vs 0.375); on 500 items they tie (0.392 vs 0.388).*
 
 Three regimes, read off the table:
 
@@ -244,12 +248,12 @@ Read honestly, this is two results:
 1. **On what the base models already know, the 4-bit 8B is better.** Bonsai at 1 bit trails
    Qwen3-8B at 4 bits by 4–14 points on math (0.845 vs 0.945), medical knowledge (0.375 vs 0.515)
    and instruction following (0.640 vs 0.680), and a self-distilled adapter narrows but does not
-   close that gap (gsm8k −0.07 is significant; medmcqa −0.075 and ifeval −0.04 are within noise at
-   n = 200).
+   close that gap: at n = 500 the adapted 1-bit model is still −0.070 [−0.096, −0.046] on GSM8K and
+   −0.068 [−0.122, −0.014] on MedMCQA; IFEval −0.04 is within noise at n = 200.
 2. **A trained skill beats the bigger model where neither base has it.** On reverse-text the 87 MB
    adapter puts the 1-bit model 0.64 above the 4-bit 8B — at a quarter of the memory.
 
-**The community adapters hurt the model they were trained for — at 4 bits.** Every public Qwen3-8B adapter
+**The community adapters hurt the model they were trained for — on llama.cpp `Q4_K_M`.** Every public Qwen3-8B adapter
 lowers the 4-bit Qwen3-8B, two of them catastrophically: the GSM8K GRPO adapter loops after
 `#### N` until the token cap (0.945 → 0.25, 200/200 truncated; reproduced with upstream llama.cpp on
 CPU, so not a fork artefact), the MetaMathQA adapter stutters ("glasses glasses") (→ 0.425; its
@@ -260,8 +264,8 @@ adapters are harmless on the 4-bit Qwen3-8B except reverse-text (gsm8k 0.940, me
 ifeval 0.660 vs 0.945 / 0.515 / 0.680) — so llama.cpp's LoRA path on Q4_K_M is not broken in
 general.
 
-**It is the quantization the adapter lands on.** A controlled grid (100 items each; same server
-binary, same prompts; `results/diagnostics/`):
+**It is the `Q4_K_M` serving path.** A controlled grid (100 items each; same server binary, same
+prompts; `results/diagnostics/`):
 
 | | Qwen3-8B Q4_K_M (5.0 GB) | Qwen3-8B Q8_0 (8.7 GB) |
 |---|---|---|
@@ -273,22 +277,35 @@ binary, same prompts; `results/diagnostics/`):
 At Q8_0 the MetaMathQA adapter reproduces its author's own number (0.84, bf16 vLLM) to within noise;
 the *identical* adapter file on the *identical* model at Q4_K_M loses half its accuracy and its
 trained answer style. Greedy decoding does not rescue it, so this is not a sampling artefact, and
-the base model at Q4_K_M is fine (0.98), so it is not the quantization alone. It is the combination: a
-LoRA trained against bf16 weights, served on a 4-bit K-quant of those weights. (On the 1-bit Bonsai —
+the base model at Q4_K_M is fine (0.98), so it is not the quantization alone.
+
+**And it is not 4-bit weights as such.** Outside llama.cpp — real Qwen3-8B safetensors loaded in
+4-bit NF4 by bitsandbytes, the adapter applied by PEFT exactly as published, greedy, same 60 GSM8K
+prompts (`harness/peft_check.py`, `runs/peft/`) — the base scores 0.967 and **+ MetaMathQA 0.85 with no
+stutter**, matching its author and llama.cpp Q8_0. The failure is specific to the llama.cpp `Q4_K_M`
+GGUF + GGUF LoRA path, which is also the most common way to run a 4-bit model with an adapter
+locally. We saw it on the CUDA backend and, for the GRPO adapter, on the CPU backend of upstream
+llama.cpp too. We did not isolate the mechanism; one difference worth testing is that `Q4_K_M`
+also quantizes the token embeddings and output layer, which NF4 leaves in bf16. (The GRPO adapter
+is additionally defective on its own: it never learned to stop, and loops after the answer on every
+backend — NF4 included, where the loop usually starts after a complete `#### N` line so it still
+scores 0.833; on `Q4_K_M` the loop continues the number itself, "#### 3333…", and scores 0.25.)
+
+(On the 1-bit Bonsai —
 whose weights the adapter never saw — the same adapter is simply inert: 0.84 greedy on these 100
 items, against a base of 0.854 with env sampling on 500.) Our
 own Bonsai adapters, trained against the exact weights they are served on, show no such failure.
 
-This is the deployment hazard the 1-bit route avoids by construction. Bonsai's training checkpoint
+This is a deployment hazard the 1-bit route avoids by construction. Bonsai's training checkpoint
 (`Bonsai-8B-unpacked`) is an exact expansion of the served `Q1_0` weights, so a QLoRA trained on it
-is trained against precisely the numbers it will run on. The usual 4-bit route — download a bf16
-community LoRA, serve it on the popular Q4_K_M GGUF — has no such guarantee. Relative to each base:
+is trained against precisely the numbers it will run on, in the runtime it will run in. The usual
+local 4-bit route — download a bf16 community LoRA, serve it with llama.cpp on the popular `Q4_K_M`
+GGUF — has no such guarantee. Relative to each base:
 the MetaMathQA adapter costs 0.61 at Q4_K_M but 0.10 at Q8_0; the Tulu IF adapter costs 0.26 at Q4_K_M
 and about 0.13 at Q8_0 (measured against the Q4_K_M base, 0.67 on these items; no Q8_0 ifeval base was
-run) — a weak adapter for this env either way. The GRPO GSM8K adapter's loop at
-Q4_K_M was not re-tested at Q8_0. The safe 4-bit practice is to serve community adapters on Q8_0 or higher, which
-gives back most of the memory advantage (8.7 GB vs 1.25 GB for Q1 + adapter).
-<!-- PEFT CHECK -->
+run) — a weak adapter for this env either way. The safe practice is to validate a community adapter
+on the exact quantization and runtime it will be served on; with llama.cpp that means `Q8_0` (8.7 GB,
+giving back most of the memory advantage over 1.25 GB for Q1 + adapter) or a non-K-quant path.
 
 ### 3.7 Systems: memory and speed
 
@@ -337,9 +354,10 @@ fit at all.
   both models already know, and self-distilled adapters do not close that gap.
 - **Train adapters against the weights you serve.** The 1-bit route gets this for free (the unpacked
   checkpoint is the served model, bit for bit). The common 4-bit route — bf16 community LoRA on a
-  `Q4_K_M` GGUF — cost three of the four public adapters we tried 0.26–0.70 of task score; for the two
-  re-run at `Q8_0`, most (MetaMathQA) or half (Tulu IF) of that loss disappeared. Serve community
-  adapters on `Q8_0` or retrain them against the quantized weights.
+  `Q4_K_M` GGUF in llama.cpp — cost three of the four public adapters we tried 0.26–0.70 of task score;
+  the cleanest case (MetaMathQA) works at `Q8_0` and at 4-bit NF4 in transformers+PEFT, so the hazard is
+  the specific runtime/quantization pair, not 4 bits. Validate community adapters on the exact serving
+  stack, or retrain them against the weights you serve.
 - **Route; never apply a skill adapter blindly.** The one adapter that learned a new behaviour is
   catastrophic off-task (reverse-text adapter on GSM8K: 0.045). A tiny TRM routes full prompts
   perfectly; on bare content it reaches 86.5% and loses 0.08 of the oracle's macro score, so
@@ -351,15 +369,17 @@ fit at all.
 
 - **Small eval sets.** 200 items per environment (500 for GSM8K and MedMCQA), one sample per item;
   several differences are within noise and are reported as such. Sampling follows Qwen3's
-  non-thinking recommendation for every model; thinking mode — where PrismML's own GSM8K/IFEval
-  numbers are higher — was not evaluated.
+  non-thinking recommendation for every model; thinking mode was not evaluated. PrismML's own
+  GSM8K/IFEval numbers come from a different harness and dataset version (their IFEval is the Google
+  benchmark; ours is the Hub env's RLVR-IFEval holdout), so they are not directly comparable.
 - **One adapter recipe.** Rejection-sampling fine-tuning from the base's own samples can only
   amplify what the base already does; RL against the environment reward (what the Prime Intellect
   stack is built for) or distillation from a stronger model would likely do more on GSM8K and IFEval.
 - **Few public adapters.** Four were found that match these environments' shapes; their quality
-  varies (the Tulu IF adapter is weak at any precision). The `Q4_K_M` collapse is shown for two
-  adapters on one model; we did not isolate the mechanism inside llama.cpp, and one adapter (GRPO
-  GSM8K) was not re-run at `Q8_0`.
+  varies (the Tulu IF adapter is weak at any precision; the GRPO adapter never learned to stop). The
+  llama.cpp `Q4_K_M` collapse is shown cleanly for one adapter (MetaMathQA, controlled against `Q8_0`
+  and against NF4 + PEFT) and partially for a second (Tulu IF); we did not isolate its mechanism, and
+  the NF4 check used 60 items.
 - **One machine, noisy conditions.** An RTX 5080 Laptop shared with other jobs at times. Served
   throughput numbers were taken under that sharing and under a software power cap that later caused
   Windows TDR GPU resets; the speed table uses isolated `llama-bench` runs instead. The PrismML fork
