@@ -1,0 +1,37 @@
+[
+    {
+        "config":  "mem-q1-bonsai-8b-nolora",
+        "model_bytes":  1158654496,
+        "lora_bytes":  0,
+        "vram_delta_mib":  1918,
+        "ram_working_set_mib":  1453
+    },
+    {
+        "config":  "mem-q1-bonsai-8b-lora4",
+        "model_bytes":  1158654496,
+        "lora_bytes":  349315648,
+        "vram_delta_mib":  2430,
+        "ram_working_set_mib":  1587
+    },
+    {
+        "config":  "mem-q4-qwen3-8b-nolora",
+        "model_bytes":  5027783488,
+        "lora_bytes":  0,
+        "vram_delta_mib":  5358,
+        "ram_working_set_mib":  4893
+    },
+    {
+        "config":  "mem-q4-qwen3-8b-lora4",
+        "model_bytes":  5027783488,
+        "lora_bytes":  349315648,
+        "vram_delta_mib":  5870,
+        "ram_working_set_mib":  5026
+    },
+    {
+        "config":  "mem-q4-qwen3-1.7b-nolora",
+        "model_bytes":  1107409472,
+        "lora_bytes":  0,
+        "vram_delta_mib":  1774,
+        "ram_working_set_mib":  1475
+    }
+]

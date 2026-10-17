@@ -12,9 +12,15 @@ $S = @('--n', '100')
 function Run([string]$name, [string]$model, [string[]]$lora, [string]$envn, [string]$tag, [string[]]$x) {
     WaitGpu 12000
     & "$R\harness\serve.ps1" -Name "x-$name" -Model $model -Lora $lora -Port 8096 -Np 4 -Ctx 32768 | ForEach-Object { Log $_ }
-    Gen $envn "diag:$name:$tag" "$D\$envn\$name-$tag" $x
+    Gen $envn "diag:${name}:${tag}" "$D\$envn\$name-$tag" $x
     StopServer 8096
 }
+# resume phase E's Q4 medmcqa extension (the fork crashed mid-run with ggml-cuda.cu:107; 274/500 rows were kept)
+WaitGpu 12000
+& "$R\harness\serve.ps1" -Name q4-ext2 -Model $Q4 -Port 8096 -Np 4 -Ctx 32768 | ForEach-Object { Log $_ }
+Gen 'medmcqa' 'q4-base' "$R\results\medmcqa\q4-base" @('--n', '500')
+StopServer 8096
+
 foreach ($q in @(@('q4km', $Q4), @('q8', $Q8))) {
     if (-not (Test-Path $q[1])) { Log "phase X: missing $($q[1])"; continue }
     Run "$($q[0])-base" $q[1] @() 'gsm8k' 'greedy' $G

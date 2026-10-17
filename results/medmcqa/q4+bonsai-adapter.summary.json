@@ -1,0 +1,29 @@
+{
+  "env": "medmcqa",
+  "split": "eval",
+  "label": "q4+bonsai-adapter",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.51,
+  "score_ci95": 0.0695,
+  "reward_mean": 0.5049,
+  "metrics_mean": {
+    "accuracy_reward": 0.51,
+    "thinking_reward": 0.2595,
+    "boxed_reward": 0.96
+  },
+  "completion_tokens_mean": 242.1,
+  "truncated_frac": 0.0,
+  "wall_s_this_run": 481.0,
+  "agg_tokens_per_s_this_run": 100.7,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 1024,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

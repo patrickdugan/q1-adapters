@@ -35,7 +35,10 @@ foreach ($srv in @(@('q1', $Q1), @('q4', $Q4))) {
 }
 $Q4s = 'C:\Users\patri\Documents\Codex\models\gguf\Qwen3-1.7B-Q4_K_M.gguf'
 WaitGpu 9000
-& "$R\harness\serve.ps1" -Name q4-1.7b-ext -Model $Q4s -Port 8096 -Np 4 -Ctx 32768 | ForEach-Object { Log $_ }
+# the PrismML fork's CUDA path crashes on Qwen3-1.7B (ggml-cuda.cu:107 after a few requests); serve it with upstream
+$up = 'C:\Users\patri\Documents\Codex\2026-09-30\pu\work\llama.cpp\b11269\llama-server.exe'
+& "$R\harness\serve.ps1" -Name q4-1.7b-ext -Model $Q4s -Port 8096 -Np 4 -Ctx 32768 -Exe $up | ForEach-Object { Log $_ }
+foreach ($e in @('reverse-text', 'ifeval')) { Gen $e 'q4-1.7b-base' "$R\results\$e\q4-1.7b-base" }
 foreach ($e in @('gsm8k', 'medmcqa')) { Gen $e 'q4-1.7b-base' "$R\results\$e\q4-1.7b-base" $N }
 StopServer 8096
 & 'C:\Users\patri\OneDrive\Documents\GitHub\Spiral\.venv\Scripts\python.exe' -X utf8 "$PSScriptRoot\make_tables.py" *> (Join-Path $R 'runs\tables.out.log')

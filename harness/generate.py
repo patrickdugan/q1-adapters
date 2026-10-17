@@ -80,7 +80,7 @@ async def _run(args) -> int:
     sem = asyncio.Semaphore(args.concurrency)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    jsonl = out.with_suffix(".jsonl")
+    jsonl = out.parent / (out.name + ".jsonl")  # not with_suffix: a stem like 'q4-1.7b-base' has a dot in it
     done = set()
     if jsonl.exists() and args.resume:
         for line in _lines(jsonl):
@@ -117,7 +117,7 @@ async def _run(args) -> int:
                      "max_tokens": max_tokens, "enable_thinking": False, "concurrency": args.concurrency},
         "base_url": args.base_url,
     }
-    out.with_suffix(".summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    (out.parent / (out.name + ".summary.json")).write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({k: summary[k] for k in ("env", "label", "n_samples", "score_mean", "score_ci95", "reward_mean",
                                                "completion_tokens_mean", "truncated_frac", "agg_tokens_per_s_this_run")}), flush=True)
     return 0

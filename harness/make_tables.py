@@ -127,6 +127,30 @@ def main() -> int:
             if d:
                 lines.append(f"- {env} {k.replace('delta_', '').replace('_', ' ')}: {d['delta']:+.3f} "
                              f"[{d['ci95'][0]:+.3f}, {d['ci95'][1]:+.3f}] (n={d['n']})")
+    # extended table: gsm8k + medmcqa at n=500 for the configurations run that far (common ids per env)
+    ext = {"q4-1.7b-base": "Q4 1.7B base", "q1-base": "Q1 base", "q1+ours": "Q1 + our adapter",
+           "q1+online-gsm8k-grpo": "Q1 + GRPO-GSM8K", "q1+online-gsm8k-metamath": "Q1 + MetaMathQA",
+           "q1+online-medmcqa-vireshk": "Q1 + MedMCQA LoRA", "q4-base": "Q4 8B base"}
+    lines += ["", "Extended evaluation, 500 examples (configurations run to 500; each row averaged over the ids all of "
+              "its present configurations share):", "",
+              "| env | n | " + " | ".join(ext.values()) + " |", "|---|---|" + "---|" * len(ext)]
+    ext_summary = {}
+    for env in ("gsm8k", "medmcqa"):
+        ds = {k: load(env, k) for k in ext}
+        ds = {k: d for k, d in ds.items() if d and len(d) >= 500}
+        if not ds:
+            continue
+        common = set.intersection(*(set(d) for d in ds.values()))
+        ds = {k: {i: d[i] for i in common} for k, d in ds.items()}
+        lines.append(f"| {env} | {len(common)} | " + " | ".join(f"{mean(ds[k]):.3f}" if k in ds else "—" for k in ext) + " |")
+        ext_summary[env] = {k: mean(d) for k, d in ds.items()}
+        for a, b in (("q1-base", "q1+ours"), ("q4-1.7b-base", "q1-base"), ("q4-1.7b-base", "q1+ours"), ("q4-base", "q1+ours")):
+            if a in ds and b in ds:
+                d = paired(ds[a], ds[b])
+                ext_summary[env][f"delta {b} vs {a}"] = d
+                lines.append(f"- {env} (n={d['n']}) {ext[b]} vs {ext[a]}: {d['delta']:+.3f} [{d['ci95'][0]:+.3f}, {d['ci95'][1]:+.3f}]")
+    summary["_extended_n500"] = ext_summary
+
     # speed: llama-bench (no adapter) and served throughput with/without an active adapter
     sp = RES / "speed"
     bench_rows = []
@@ -147,6 +171,14 @@ def main() -> int:
                   "| model | device | test | tokens/s | model size (GB) |", "|---|---|---|---|---|"]
         for name, dev, kind, n, ts, size in bench_rows:
             lines.append(f"| {name} | {dev} | {kind}{n} | {ts:.1f} | {size / 1e9:.2f} |")
+    memf = RES / "memory.json"
+    if memf.exists():
+        mem = json.loads(memf.read_text(encoding="utf-8-sig"))
+        lines += ["", "Deployment footprint (llama-server, 1 slot, 4k context; VRAM = nvidia-smi delta, RAM = working set):", "",
+                  "| server | weights file | adapters | VRAM | process RAM |", "|---|---|---|---|---|"]
+        for m in mem:
+            lines.append(f"| {m['config'].replace('mem-', '')} | {m['model_bytes'] / 1e9:.2f} GB | {m['lora_bytes'] / 1e6:.0f} MB | "
+                         f"{m['vram_delta_mib'] / 1024:.2f} GiB | {m['ram_working_set_mib'] / 1024:.2f} GiB |")
     thr = []
     for env in ENVS:
         for f in sorted((RES / env).glob("*.summary.json")):
@@ -175,8 +207,11 @@ def main() -> int:
             ax.set_ylabel(METRIC[env])
             ax.grid(alpha=0.3)
             ax.set_xlim(0, 6)
-        h, lab = axes[0].get_legend_handles_labels()
-        fig.legend(h, lab, loc="lower center", ncol=5, frameon=False)
+        seen = {}
+        for ax in axes:  # union over panels: reverse-text has no online adapter, so its legend alone is short
+            for h, lab in zip(*ax.get_legend_handles_labels()):
+                seen.setdefault(lab, h)
+        fig.legend(list(seen.values()), list(seen.keys()), loc="lower center", ncol=5, frameon=False)
         fig.tight_layout(rect=(0, 0.08, 1, 1))
         fig.savefig(RES / "figures" / "score_vs_memory.png", dpi=150)
     print((RES / "tables.md").read_text(encoding="utf-8"))

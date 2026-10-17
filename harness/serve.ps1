@@ -10,13 +10,16 @@ param(
     [int]$Port = 8096,
     [int]$Np = 8,
     [int]$Ctx = 16384,
-    [switch]$LoraInitWithoutApply
+    [switch]$LoraInitWithoutApply,
+    # default: PrismML fork (required for Q1_0). Its CUDA path crashes on Qwen3-1.7B, which is served by upstream.
+    [string]$Exe = 'C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\llama-server.exe'
 )
 $ErrorActionPreference = 'Stop'
+$Lora = @($Lora | Where-Object { $_ })  # an empty @() passed through an if-expression arrives as $null
 $repo = Split-Path -Parent $PSScriptRoot
 $srvDir = Join-Path $repo 'runs\servers'
 New-Item -ItemType Directory -Force $srvDir | Out-Null
-$exe = 'C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\llama-server.exe'
+$exe = $Exe
 $tmpl = 'C:\Users\patri\Documents\Codex\BitAgent-gym\runs\hf-cache\models--prism-ml--Bonsai-8B-unpacked\snapshots\376f381570d6115bc03f82adcfa4af0c7672ae54\chat_template.jinja'
 
 # stop only a server this script started on the same port
@@ -31,7 +34,8 @@ function UsedMiB { [int](nvidia-smi --query-gpu=memory.used --format=csv,noheade
 $before = UsedMiB
 $argList = @('-m', $Model, '--port', "$Port", '--host', '127.0.0.1', '-ngl', '99', '-c', "$Ctx", '--parallel', "$Np",
              '--jinja', '--chat-template-file', $tmpl, '--metrics',
-             '--cache-ram', '1024')  # host prompt cache defaults to 8 GiB of RAM; the eval prompts barely reuse prefixes
+             '--cache-ram', '1024',  # host prompt cache defaults to 8 GiB of RAM; the eval prompts barely reuse prefixes
+             '-ub', '128')  # shorter GPU kernels: from 17:00 on 10-17 the power-capped GPU tripped Windows TDR resets
 foreach ($l in $Lora) { $argList += @('--lora', $l) }
 if ($LoraInitWithoutApply) { $argList += '--lora-init-without-apply' }
 $log = Join-Path $srvDir "$Name.log"

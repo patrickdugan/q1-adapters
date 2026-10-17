@@ -103,3 +103,76 @@
 [10-17 18:47:39] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:1.0 5:0.0 6:0.0 7:0.0 for ours-reverse-text
 [10-17 18:55:16] reverse-text q4+bonsai-adapter: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "reverse-text", "label": "q4+bonsai-adapter", "n_samples": 200, "score_mean": 0.0934, "score_ci95": 0.0245, "reward_mean": 0.0934, "completion_tokens_mean": 142.7, "truncated_frac": 0.285, "agg_tokens_per_s_this_run": 64.1} (457s)
 [10-17 18:55:16] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:1.0 6:0.0 7:0.0 for ours-gsm8k
+[10-17 19:05:38] gsm8k q4+bonsai-adapter: {"env": "gsm8k", "label": "q4+bonsai-adapter", "n_samples": 200, "score_mean": 0.94, "score_ci95": 0.033, "reward_mean": 0.94, "completion_tokens_mean": 261.7, "truncated_frac": 0.005, "agg_tokens_per_s_this_run": 85.1} (621s)
+[10-17 19:05:38] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:1.0 7:0.0 for ours-medmcqa
+[10-17 19:13:52] medmcqa q4+bonsai-adapter: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4+bonsai-adapter", "n_samples": 200, "score_mean": 0.51, "score_ci95": 0.0695, "reward_mean": 0.5049, "completion_tokens_mean": 242.1, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 100.7} (494s)
+[10-17 19:13:52] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:1.0 for ours-ifeval
+[10-17 19:22:01] ifeval q4+bonsai-adapter: {"env": "ifeval", "label": "q4+bonsai-adapter", "n_samples": 200, "score_mean": 0.66, "score_ci95": 0.0658, "reward_mean": 0.66, "completion_tokens_mean": 264.5, "truncated_frac": 0.105, "agg_tokens_per_s_this_run": 110.1} (490s)
+[10-17 19:22:04] phase D: start Qwen3-1.7B Q4_K_M server
+[10-17 19:22:15] server q4-1.7b pid=2512 port=8096 vram_delta=4914 MiB
+[10-17 19:23:46] reverse-text q4-1.7b-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback Traceback (most recent call last): httpcore2.ConnectError: All connection attempts failed Traceback (most recent call last): httpx2.ConnectError: All connection attempts failed Traceback (most recent call last): openai.APIConnectionError: Connection error. (91s)
+[10-17 19:24:51] gsm8k q4-1.7b-base: Traceback (most recent call last): httpcore2.ConnectError: All connection attempts failed Traceback (most recent call last): httpx2.ConnectError: All connection attempts failed Traceback (most recent call last): openai.APIConnectionError: Connection error. (65s)
+[10-17 19:26:06] medmcqa q4-1.7b-base: Traceback (most recent call last): httpcore2.ConnectError: All connection attempts failed Traceback (most recent call last): httpx2.ConnectError: All connection attempts failed Traceback (most recent call last): openai.APIConnectionError: Connection error. (75s)
+[10-17 19:27:18] ifeval q4-1.7b-base: Traceback (most recent call last): httpcore2.ConnectError: All connection attempts failed Traceback (most recent call last): httpx2.ConnectError: All connection attempts failed Traceback (most recent call last): openai.APIConnectionError: Connection error. (72s)
+[10-17 19:27:18] phase D: llama-bench Q1 vs Q4 (GPU, then CPU)
+[10-17 19:27:27] phase D: bench q1 done
+[10-17 19:27:47] phase D: bench q4 done
+[10-17 19:27:52] phase D: bench q4-1.7b done
+[10-17 19:27:52] phase D: done
+[10-17 19:27:57] chain: all phases done
+[10-17 19:28:13] phase E: start q1 server
+[10-17 19:28:20] server q1-ext pid=35520 port=8096 vram_delta=6458 MiB
+[10-17 19:28:27] gsm8k q1-base: {"env": "gsm8k", "label": "q1-base", "n_samples": 500, "score_mean": 0.854, "score_ci95": 0.031, "reward_mean": 0.854, "completion_tokens_mean": 270.2, "truncated_frac": 0.008, "agg_tokens_per_s_this_run": null} (7s)
+[10-17 19:28:39] medmcqa q1-base: {"env": "medmcqa", "label": "q1-base", "n_samples": 500, "score_mean": 0.388, "score_ci95": 0.0428, "reward_mean": 0.4301, "completion_tokens_mean": 253.9, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": null} (13s)
+[10-17 19:28:39] lora scales: 0:1.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 for gsm8k-grpo on q1
+[10-17 19:36:57] gsm8k q1+online:gsm8k-grpo: {"env": "gsm8k", "label": "q1+online:gsm8k-grpo", "n_samples": 500, "score_mean": 0.86, "score_ci95": 0.0304, "reward_mean": 0.86, "completion_tokens_mean": 252.0, "truncated_frac": 0.004, "agg_tokens_per_s_this_run": 256.4} (498s)
+[10-17 19:36:57] lora scales: 0:0.0 1:1.0 2:0.0 3:0.0 4:0.0 5:0.0 for gsm8k-metamath on q1
+[10-17 19:45:20] gsm8k q1+online:gsm8k-metamath: {"env": "gsm8k", "label": "q1+online:gsm8k-metamath", "n_samples": 500, "score_mean": 0.842, "score_ci95": 0.032, "reward_mean": 0.842, "completion_tokens_mean": 253.6, "truncated_frac": 0.004, "agg_tokens_per_s_this_run": 257.3} (502s)
+[10-17 19:45:20] lora scales: 0:0.0 1:0.0 2:1.0 3:0.0 4:0.0 5:0.0 for medmcqa-vireshk on q1
+[10-17 19:53:20] medmcqa q1+online:medmcqa-vireshk: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q1+online:medmcqa-vireshk", "n_samples": 500, "score_mean": 0.408, "score_ci95": 0.0431, "reward_mean": 0.439, "completion_tokens_mean": 214.4, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 230.2} (480s)
+[10-17 19:53:20] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:1.0 5:0.0 for ours-gsm8k on q1
+[10-17 20:01:44] gsm8k q1+ours: {"env": "gsm8k", "label": "q1+ours", "n_samples": 500, "score_mean": 0.868, "score_ci95": 0.0297, "reward_mean": 0.868, "completion_tokens_mean": 255.2, "truncated_frac": 0.008, "agg_tokens_per_s_this_run": 257.2} (505s)
+[10-17 20:01:44] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:1.0 for ours-medmcqa on q1
+[10-17 20:09:46] medmcqa q1+ours: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q1+ours", "n_samples": 500, "score_mean": 0.45, "score_ci95": 0.0437, "reward_mean": 0.475, "completion_tokens_mean": 235.6, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 251.0} (482s)
+[10-17 20:09:50] phase E: start q4 server
+[10-17 20:09:58] server q4-ext pid=7324 port=8096 vram_delta=9898 MiB
+[10-17 20:16:22] gsm8k q4-base: {"env": "gsm8k", "label": "q4-base", "n_samples": 500, "score_mean": 0.938, "score_ci95": 0.0212, "reward_mean": 0.938, "completion_tokens_mean": 259.4, "truncated_frac": 0.002, "agg_tokens_per_s_this_run": 345.1} (384s)
+[10-17 20:19:19] medmcqa q4-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback Traceback (most recent call last): httpcore2.ConnectError: All connection attempts failed Traceback (most recent call last): httpx2.ConnectError: All connection attempts failed Traceback (most recent call last): openai.APIConnectionError: Connection error. (177s)
+[10-17 20:19:38] server q4-1.7b-ext pid=32116 port=8096 vram_delta=4908 MiB
+[10-17 20:21:25] reverse-text q4-1.7b-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "reverse-text", "label": "q4-1.7b-base", "n_samples": 200, "score_mean": 0.0746, "score_ci95": 0.0169, "reward_mean": 0.0746, "completion_tokens_mean": 268.2, "truncated_frac": 0.67, "agg_tokens_per_s_this_run": 549.9} (107s)
+[10-17 20:23:17] ifeval q4-1.7b-base: {"env": "ifeval", "label": "q4-1.7b-base", "n_samples": 200, "score_mean": 0.59, "score_ci95": 0.0683, "reward_mean": 0.59, "completion_tokens_mean": 278.0, "truncated_frac": 0.125, "agg_tokens_per_s_this_run": 550.8} (112s)
+[10-17 20:27:01] gsm8k q4-1.7b-base: {"env": "gsm8k", "label": "q4-1.7b-base", "n_samples": 500, "score_mean": 0.802, "score_ci95": 0.035, "reward_mean": 0.802, "completion_tokens_mean": 271.3, "truncated_frac": 0.034, "agg_tokens_per_s_this_run": 624.3} (224s)
+[10-17 20:30:20] medmcqa q4-1.7b-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4-1.7b-base", "n_samples": 500, "score_mean": 0.392, "score_ci95": 0.0428, "reward_mean": 0.4337, "completion_tokens_mean": 231.5, "truncated_frac": 0.002, "agg_tokens_per_s_this_run": 621.8} (200s)
+[10-17 20:30:26] phase E: done
+[10-17 20:31:38] phase M: mem-q1-bonsai-8b-nolora vram_delta=1918 MiB ram=1453 MiB
+[10-17 20:31:53] phase M: mem-q1-bonsai-8b-lora4 vram_delta=2430 MiB ram=1587 MiB
+[10-17 20:32:07] phase M: mem-q4-qwen3-8b-nolora vram_delta=5358 MiB ram=4893 MiB
+[10-17 20:32:21] phase M: mem-q4-qwen3-8b-lora4 vram_delta=5870 MiB ram=5026 MiB
+[10-17 20:32:34] phase M: mem-q4-qwen3-1.7b-nolora vram_delta=1774 MiB ram=1475 MiB
+[10-17 20:32:34] phase M: done
+[10-17 20:33:24] server q4-ext2 pid=20368 port=8096 vram_delta=9394 MiB
+[10-17 20:35:36] medmcqa q4-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback Traceback (most recent call last): httpcore2.ConnectError: All connection attempts failed Traceback (most recent call last): httpx2.ConnectError: All connection attempts failed Traceback (most recent call last): openai.APIConnectionError: Connection error. (131s)
+[10-17 20:35:44] server x-q4km-base pid=18664 port=8096 vram_delta=9394 MiB
+[10-17 20:38:09] gsm8k diag:q4km-base:greedy: {"env": "gsm8k", "label": "diag:q4km-base:greedy", "n_samples": 100, "score_mean": 0.98, "score_ci95": 0.0276, "reward_mean": 0.98, "completion_tokens_mean": 262.3, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 188.5} (145s)
+[10-17 20:38:19] server x-q4km-metamath pid=34616 port=8096 vram_delta=9518 MiB
+[10-17 20:43:23] gsm8k diag:q4km-metamath:greedy: {"env": "gsm8k", "label": "diag:q4km-metamath:greedy", "n_samples": 100, "score_mean": 0.37, "score_ci95": 0.0951, "reward_mean": 0.37, "completion_tokens_mean": 351.7, "truncated_frac": 0.36, "agg_tokens_per_s_this_run": 118.5} (304s)
+[10-17 20:43:32] server x-q4km-metamath pid=35820 port=8096 vram_delta=9518 MiB
+[10-17 20:49:05] gsm8k diag:q4km-metamath:sampled: {"env": "gsm8k", "label": "diag:q4km-metamath:sampled", "n_samples": 100, "score_mean": 0.38, "score_ci95": 0.0956, "reward_mean": 0.38, "completion_tokens_mean": 308.4, "truncated_frac": 0.29, "agg_tokens_per_s_this_run": 94.5} (333s)
+[10-17 20:49:14] server x-q4km-tulu pid=12492 port=8096 vram_delta=9518 MiB
+[10-17 20:54:32] ifeval diag:q4km-tulu:sampled: {"env": "ifeval", "label": "diag:q4km-tulu:sampled", "n_samples": 100, "score_mean": 0.41, "score_ci95": 0.0969, "reward_mean": 0.41, "completion_tokens_mean": 307.4, "truncated_frac": 0.15, "agg_tokens_per_s_this_run": 100.4} (318s)
+[10-17 20:54:45] server x-q8-base pid=19224 port=8096 vram_delta=12530 MiB
+[10-17 20:57:23] gsm8k diag:q8-base:greedy: {"env": "gsm8k", "label": "diag:q8-base:greedy", "n_samples": 100, "score_mean": 0.97, "score_ci95": 0.0336, "reward_mean": 0.97, "completion_tokens_mean": 254.5, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 169.6} (159s)
+[10-17 20:57:35] server x-q8-metamath pid=21224 port=8096 vram_delta=12732 MiB
+[10-17 20:59:35] gsm8k diag:q8-metamath:greedy: {"env": "gsm8k", "label": "diag:q8-metamath:greedy", "n_samples": 100, "score_mean": 0.87, "score_ci95": 0.0662, "reward_mean": 0.87, "completion_tokens_mean": 121.3, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 106.6} (121s)
+[10-17 20:59:47] server x-q8-metamath pid=34220 port=8096 vram_delta=12732 MiB
+[10-17 21:01:53] gsm8k diag:q8-metamath:sampled: {"env": "gsm8k", "label": "diag:q8-metamath:sampled", "n_samples": 100, "score_mean": 0.84, "score_ci95": 0.0722, "reward_mean": 0.84, "completion_tokens_mean": 126.2, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 107.4} (126s)
+[10-17 21:02:04] server x-q8-tulu pid=9296 port=8096 vram_delta=12732 MiB
+[10-17 21:06:43] ifeval diag:q8-tulu:sampled: {"env": "ifeval", "label": "diag:q8-tulu:sampled", "n_samples": 100, "score_mean": 0.54, "score_ci95": 0.0982, "reward_mean": 0.54, "completion_tokens_mean": 210.0, "truncated_frac": 0.05, "agg_tokens_per_s_this_run": 79.0} (279s)
+[10-17 21:06:52] server x-q1-metamath pid=21348 port=8096 vram_delta=6078 MiB
+[10-17 21:10:10] gsm8k diag:q1-metamath:greedy: {"env": "gsm8k", "label": "diag:q1-metamath:greedy", "n_samples": 100, "score_mean": 0.84, "score_ci95": 0.0722, "reward_mean": 0.84, "completion_tokens_mean": 259.6, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 135.7} (199s)
+[10-17 21:10:14] phase X: done
+[10-17 21:10:17] chainX: done
+[10-17 21:11:09] server q4-1.7b-rt pid=27776 port=8096 vram_delta=4872 MiB
+[10-17 21:12:51] reverse-text q4-1.7b-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "reverse-text", "label": "q4-1.7b-base", "n_samples": 200, "score_mean": 0.0785, "score_ci95": 0.0171, "reward_mean": 0.0785, "completion_tokens_mean": 269.2, "truncated_frac": 0.67, "agg_tokens_per_s_this_run": 595.3} (102s)
+[10-17 21:12:56] chainF: done
+[10-17 21:13:54] server q4-ext3-0 pid=11052 port=8096 vram_delta=9316 MiB

@@ -1,13 +1,13 @@
 {
   "reverse-text": {
     "n_common": 200,
-    "q4_1.7b_base": null,
+    "q4_1.7b_base": 0.07852739472715684,
     "q1_base": 0.11547322102239573,
     "q1_ours": 0.8171459398828465,
-    "q4_base": null,
+    "q4_base": 0.1782727872540589,
     "q1_online": null,
     "q4_online": null,
-    "q4_bonsai_adapter": null,
+    "q4_bonsai_adapter": 0.0933908536645172,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.7016727188604507,
@@ -15,26 +15,53 @@
         0.6819717835683409,
         0.7218324754017347
       ]
+    },
+    "delta_q1_base_vs_q4_1.7b_base": {
+      "n": 200,
+      "delta": 0.03694582629523888,
+      "ci95": [
+        0.014872912386832787,
+        0.058726555680439246
+      ]
+    },
+    "delta_q1_ours_vs_q4_base": {
+      "n": 200,
+      "delta": 0.6388731526287876,
+      "ci95": [
+        0.6053081943870858,
+        0.6724471725967266
+      ]
     }
   },
   "gsm8k": {
     "n_common": 200,
-    "q4_1.7b_base": null,
+    "q4_1.7b_base": 0.8,
     "q1_base": 0.845,
     "q1_ours": 0.875,
-    "q4_base": null,
+    "q4_base": 0.945,
     "q1_online": {
       "adapter": "q1+online-gsm8k-grpo",
       "score": 0.87
     },
-    "q4_online": null,
-    "q4_bonsai_adapter": null,
+    "q4_online": {
+      "adapter": "q4+online-gsm8k-metamath",
+      "score": 0.425
+    },
+    "q4_bonsai_adapter": 0.94,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.03,
       "ci95": [
         -0.02,
         0.075
+      ]
+    },
+    "delta_q1_base_vs_q4_1.7b_base": {
+      "n": 200,
+      "delta": 0.045,
+      "ci95": [
+        -0.015,
+        0.105
       ]
     },
     "delta_q1_online_vs_q1_base": {
@@ -44,26 +71,61 @@
         -0.025,
         0.075
       ]
+    },
+    "delta_q4_online_vs_q4_base": {
+      "n": 200,
+      "delta": -0.52,
+      "ci95": [
+        -0.59,
+        -0.445
+      ]
+    },
+    "delta_q1_ours_vs_q4_base": {
+      "n": 200,
+      "delta": -0.07,
+      "ci95": [
+        -0.11,
+        -0.03
+      ]
+    },
+    "delta_q1_ours_vs_q4_online": {
+      "n": 200,
+      "delta": 0.45,
+      "ci95": [
+        0.375,
+        0.525
+      ]
     }
   },
   "medmcqa": {
     "n_common": 200,
-    "q4_1.7b_base": null,
+    "q4_1.7b_base": 0.425,
     "q1_base": 0.375,
     "q1_ours": 0.44,
-    "q4_base": null,
+    "q4_base": 0.515,
     "q1_online": {
       "adapter": "q1+online-medmcqa-vireshk",
       "score": 0.42
     },
-    "q4_online": null,
-    "q4_bonsai_adapter": null,
+    "q4_online": {
+      "adapter": "q4+online-medmcqa-vireshk",
+      "score": 0.475
+    },
+    "q4_bonsai_adapter": 0.51,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.065,
       "ci95": [
         -0.005,
         0.135
+      ]
+    },
+    "delta_q1_base_vs_q4_1.7b_base": {
+      "n": 200,
+      "delta": -0.05,
+      "ci95": [
+        -0.13,
+        0.035
       ]
     },
     "delta_q1_online_vs_q1_base": {
@@ -73,26 +135,61 @@
         -0.03,
         0.12
       ]
+    },
+    "delta_q4_online_vs_q4_base": {
+      "n": 200,
+      "delta": -0.04,
+      "ci95": [
+        -0.13,
+        0.045
+      ]
+    },
+    "delta_q1_ours_vs_q4_base": {
+      "n": 200,
+      "delta": -0.075,
+      "ci95": [
+        -0.16,
+        0.015
+      ]
+    },
+    "delta_q1_ours_vs_q4_online": {
+      "n": 200,
+      "delta": -0.035,
+      "ci95": [
+        -0.12,
+        0.05
+      ]
     }
   },
   "ifeval": {
     "n_common": 200,
-    "q4_1.7b_base": null,
+    "q4_1.7b_base": 0.59,
     "q1_base": 0.64,
     "q1_ours": 0.64,
-    "q4_base": null,
+    "q4_base": 0.68,
     "q1_online": {
       "adapter": "q1+online-ifeval-tulu",
       "score": 0.63
     },
-    "q4_online": null,
-    "q4_bonsai_adapter": null,
+    "q4_online": {
+      "adapter": "q4+online-ifeval-tulu",
+      "score": 0.375
+    },
+    "q4_bonsai_adapter": 0.66,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.0,
       "ci95": [
         -0.045,
         0.04
+      ]
+    },
+    "delta_q1_base_vs_q4_1.7b_base": {
+      "n": 200,
+      "delta": 0.05,
+      "ci95": [
+        -0.005,
+        0.105
       ]
     },
     "delta_q1_online_vs_q1_base": {
@@ -102,6 +199,102 @@
         -0.05,
         0.025
       ]
+    },
+    "delta_q4_online_vs_q4_base": {
+      "n": 200,
+      "delta": -0.305,
+      "ci95": [
+        -0.38,
+        -0.23
+      ]
+    },
+    "delta_q1_ours_vs_q4_base": {
+      "n": 200,
+      "delta": -0.04,
+      "ci95": [
+        -0.09,
+        0.01
+      ]
+    },
+    "delta_q1_ours_vs_q4_online": {
+      "n": 200,
+      "delta": 0.265,
+      "ci95": [
+        0.195,
+        0.34
+      ]
+    }
+  },
+  "_extended_n500": {
+    "gsm8k": {
+      "q4-1.7b-base": 0.802,
+      "q1-base": 0.854,
+      "q1+ours": 0.868,
+      "q1+online-gsm8k-grpo": 0.86,
+      "q1+online-gsm8k-metamath": 0.842,
+      "q4-base": 0.938,
+      "delta q1+ours vs q1-base": {
+        "n": 500,
+        "delta": 0.014,
+        "ci95": [
+          -0.014,
+          0.044
+        ]
+      },
+      "delta q1-base vs q4-1.7b-base": {
+        "n": 500,
+        "delta": 0.052,
+        "ci95": [
+          0.014,
+          0.088
+        ]
+      },
+      "delta q1+ours vs q4-1.7b-base": {
+        "n": 500,
+        "delta": 0.066,
+        "ci95": [
+          0.032,
+          0.102
+        ]
+      },
+      "delta q1+ours vs q4-base": {
+        "n": 500,
+        "delta": -0.07,
+        "ci95": [
+          -0.096,
+          -0.046
+        ]
+      }
+    },
+    "medmcqa": {
+      "q4-1.7b-base": 0.392,
+      "q1-base": 0.388,
+      "q1+ours": 0.45,
+      "q1+online-medmcqa-vireshk": 0.408,
+      "delta q1+ours vs q1-base": {
+        "n": 500,
+        "delta": 0.062,
+        "ci95": [
+          0.018,
+          0.108
+        ]
+      },
+      "delta q1-base vs q4-1.7b-base": {
+        "n": 500,
+        "delta": -0.004,
+        "ci95": [
+          -0.048,
+          0.044
+        ]
+      },
+      "delta q1+ours vs q4-1.7b-base": {
+        "n": 500,
+        "delta": 0.058,
+        "ci95": [
+          0.01,
+          0.106
+        ]
+      }
     }
   }
 }

@@ -1,0 +1,12 @@
+﻿llama-bench.exe : ggml_cuda_init: found 1 CUDA devices (Total VRAM: 16302 MiB):
+At C:\Users\patri\OneDrive\Documents\GitHub\q1-adapters\harness\phaseD.ps1:42 char:5
++     & $bench -m $m[1] -ngl 99 -p 512 -n 128 -r 3 -o json 2> "$R\resul ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ggml_cuda_init:...AM: 16302 MiB)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  Device 0: NVIDIA GeForce RTX 5080 Laptop GPU, compute capability 12.0, VMM: yes, VRAM: 16302 MiB
+load_backend: loaded CUDA backend from C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\ggml-cuda.dll
+load_backend: loaded RPC backend from C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\ggml-rpc.dll
+load_backend: loaded CPU backend from 
+C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\ggml-cpu-cascadelake.dll
