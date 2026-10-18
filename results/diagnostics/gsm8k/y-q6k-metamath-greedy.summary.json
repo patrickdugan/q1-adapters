@@ -1,0 +1,27 @@
+{
+  "env": "gsm8k",
+  "split": "eval",
+  "label": "diag:y-q6k-metamath:greedy",
+  "n_examples": 100,
+  "k": 1,
+  "n_samples": 100,
+  "score_mean": 0.84,
+  "score_ci95": 0.0722,
+  "reward_mean": 0.84,
+  "metrics_mean": {
+    "correct": 0.84
+  },
+  "completion_tokens_mean": 118.7,
+  "truncated_frac": 0.0,
+  "wall_s_this_run": 139.3,
+  "agg_tokens_per_s_this_run": 85.2,
+  "sampling": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "top_k": 0,
+    "max_tokens": 768,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

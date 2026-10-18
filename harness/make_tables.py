@@ -26,6 +26,7 @@ GB = 1e9
 Q1_BYTES = 1_158_654_496
 Q4_BYTES = 5_027_783_488
 Q4S_BYTES = 1_107_409_472  # Qwen3-1.7B Q4_K_M: the memory-matched 4-bit baseline
+Q4OWN_BYTES = 5_027_783_616  # our Q4_K_M from the exact Qwen/Qwen3-8B weights
 LORA_BYTES = 87_328_928
 
 
@@ -60,6 +61,8 @@ def best_online(env: str, prefix: str):
     best = None
     for f in sorted((RES / env).glob(f"{prefix}online-*.jsonl")):
         d = load(env, f.stem)
+        if d and len(d) < 200:  # an in-flight (incomplete) run would shrink the row's common item set
+            continue
         if d and (best is None or mean(d) > mean(best[1])):
             best = (f.stem, d)
     return best
@@ -71,11 +74,19 @@ def main() -> int:
                  "Q1 + online Qwen3 adapter | Q4 8B base (5.03 GB) | Q4 8B + online adapter (5.11 GB) | Q4 8B + our Bonsai adapter |")
     lines.append("|---|---|---|---|---|---|---|---|---|")
     pts = []
+    official = []
     for env in ENVS:
-        q1b, q1o, q4b = load(env, "q1-base"), load(env, "q1+ours"), load(env, "q4-base")
+        # Q4 8B columns come from our own Q4_K_M converted from the exact Qwen/Qwen3-8B weights ("q4own") when
+        # available: Qwen's official Q4_K_M GGUF is built from an AWQ-rescaled checkpoint (different weight basis),
+        # which misapplies LoRAs trained on Qwen/Qwen3-8B. The official-file results are kept as a separate block.
+        p = "q4own" if (RES / env / "q4own-base.jsonl").exists() else "q4"
+        q1b, q1o, q4b = load(env, "q1-base"), load(env, "q1+ours"), load(env, f"{p}-base")
         q4s = load(env, "q4-1.7b-base")
-        q1on, q4on = best_online(env, "q1+"), best_online(env, "q4+")
-        q4ours = load(env, "q4+bonsai-adapter")
+        q1on, q4on = best_online(env, "q1+"), best_online(env, f"{p}+")
+        q4ours = load(env, f"{p}+bonsai-adapter")
+        if p == "q4own":
+            ob, oon, oours = load(env, "q4-base"), best_online(env, "q4+"), load(env, "q4+bonsai-adapter")
+            official.append((env, ob and mean(ob), oon and (oon[0], mean(oon[1])), oours and mean(oours)))
         # every cell of a row is averaged over the SAME examples: the ids all its configurations answered
         present = [d for d in (q1b, q1o, q4b, q4s, q4ours, q1on and q1on[1], q4on and q4on[1]) if d]
         common = set.intersection(*(set(d) for d in present)) if present else set()
@@ -111,13 +122,24 @@ def main() -> int:
             return "—" if not o else f"{mean(o[1]):.3f} ({o[0].split('online-')[-1]})"
         lines.append(f"| {env} ({METRIC[env]}) | {row['n_common']} | {f(row['q4_1.7b_base'])} | {f(row['q1_base'])} | {f(row['q1_ours'])} | "
                      f"{fo(q1on)} | {f(row['q4_base'])} | {fo(q4on)} | {f(row['q4_bonsai_adapter'])} |")
+        q4mem = Q4OWN_BYTES if p == "q4own" else Q4_BYTES
         for lab, val, mem in [("Q4 1.7B base", row["q4_1.7b_base"], Q4S_BYTES),
                               ("Q1 base", row["q1_base"], Q1_BYTES), ("Q1 + adapter", row["q1_ours"], Q1_BYTES + LORA_BYTES),
-                              ("Q4 base", row["q4_base"], Q4_BYTES),
-                              ("Q4 + online adapter", q4on and mean(q4on[1]), Q4_BYTES + LORA_BYTES)]:
+                              ("Q4 base", row["q4_base"], q4mem),
+                              ("Q4 + online adapter", q4on and mean(q4on[1]), q4mem + LORA_BYTES)]:
             if val is not None:
                 pts.append((env, lab, mem / GB, val))
 
+    if official:
+        lines += ["", "Q4 8B columns above: our own Q4_K_M from the exact Qwen/Qwen3-8B weights. Qwen's official "
+                  "Qwen3-8B-Q4_K_M.gguf (general.name 'Qwen3 8B Awq Compatible Instruct'; AWQ-rescaled norms) for comparison:", "",
+                  "| env | official Q4_K_M base | official + best online adapter | official + our Bonsai adapter |",
+                  "|---|---|---|---|"]
+        for env, ob, oon, oours in official:
+            base_s = "—" if ob is None else f"{ob:.3f}"
+            online_s = "—" if not oon else f"{oon[1]:.3f} ({oon[0].split('online-')[-1]})"
+            ours_s = "—" if oours is None else f"{oours:.3f}"
+            lines.append(f"| {env} | {base_s} | {online_s} | {ours_s} |")
     lines.append("")
     lines.append("Paired deltas (same examples, same seeds; bootstrap 95% CI):")
     for env, row in summary.items():

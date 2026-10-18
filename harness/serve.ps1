@@ -12,7 +12,8 @@ param(
     [int]$Ctx = 16384,
     [switch]$LoraInitWithoutApply,
     # default: PrismML fork (required for Q1_0). Its CUDA path crashes on Qwen3-1.7B, which is served by upstream.
-    [string]$Exe = 'C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\llama-server.exe'
+    [string]$Exe = 'C:\Users\patri\Documents\Codex\BitAgent-gym\llama-prism\bin\llama-server.exe',
+    [int]$Ngl = 99  # 0 = CPU backend only
 )
 $ErrorActionPreference = 'Stop'
 $Lora = @($Lora | Where-Object { $_ })  # an empty @() passed through an if-expression arrives as $null
@@ -32,7 +33,7 @@ Get-ChildItem $srvDir -Filter '*.json' | ForEach-Object {
 }
 function UsedMiB { [int](nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits) }
 $before = UsedMiB
-$argList = @('-m', $Model, '--port', "$Port", '--host', '127.0.0.1', '-ngl', '99', '-c', "$Ctx", '--parallel', "$Np",
+$argList = @('-m', $Model, '--port', "$Port", '--host', '127.0.0.1', '-ngl', "$Ngl", '-c', "$Ctx", '--parallel', "$Np",
              '--jinja', '--chat-template-file', $tmpl, '--metrics',
              '--cache-ram', '1024',  # host prompt cache defaults to 8 GiB of RAM; the eval prompts barely reuse prefixes
              '-ub', '128')  # shorter GPU kernels: from 17:00 on 10-17 the power-capped GPU tripped Windows TDR resets

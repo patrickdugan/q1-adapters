@@ -181,3 +181,67 @@
 [10-17 21:25:53] peft check gsm8k nf4-metamath: {"file": "gsm8k.nf4-metamath.jsonl", "n": 60, "score": 0.85, "stutter": 0}
 [10-17 21:38:01] peft check gsm8k nf4-grpo: {"file": "gsm8k.nf4-grpo.jsonl", "n": 60, "score": 0.833, "stutter": 18}
 [10-17 21:38:06] chainG: done
+[10-18 16:05:04] phase Y: convert C:\Users\patri\Documents\Codex\models\hf\models--Qwen--Qwen3-8B\snapshots\b968826d9c46dd6066d109eabc6255188de91218 -> C:\Users\patri\Documents\Codex\models\gguf\phaseY\Qwen3-8B-F16.gguf
+[10-18 16:05:35] phase Y: convert exit=1 size=0 GB
+[10-18 16:05:37] phase Y: quantize Q4_K_M Q4_K_M.gguf exit=1 size=0 GB
+[10-18 16:05:37] phase Y: quantize Q4_K_M Q4_K_M-f16eo.gguf exit=1 size=0 GB
+[10-18 16:05:37] phase Y: quantize Q4_0 Q4_0.gguf exit=1 size=0 GB
+[10-18 16:05:37] phase Y: quantize Q5_K_M Q5_K_M.gguf exit=1 size=0 GB
+[10-18 16:05:38] phase Y: quantize Q6_K Q6_K.gguf exit=1 size=0 GB
+[10-18 16:05:38] phase Y: merge MetaMathQA into the HF weights
+[10-18 16:06:25] phase Y: merge exit=0 adapter: r=16 alpha=32 scale=2.0 modules=252 | merged 252/252 modules into 15 shards at C:\Users\patri\Documents\Codex\models\gguf\phaseY\merged-metamath-hf
+[10-18 16:06:25] phase Y: convert C:\Users\patri\Documents\Codex\models\gguf\phaseY\merged-metamath-hf -> C:\Users\patri\Documents\Codex\models\gguf\phaseY\merged-F16.gguf
+[10-18 16:07:33] phase Y: convert exit=0 size=15.26 GB
+[10-18 16:10:20] phase Y: quantize Q4_K_M merged-Q4_K_M.gguf exit=0 size=4.68 GB
+[10-18 16:11:52] phase Y: quantize Q8_0 merged-Q8_0.gguf exit=0 size=8.11 GB
+[10-18 16:11:53] phase Y: missing C:\Users\patri\Documents\Codex\models\gguf\phaseY\Q4_K_M.gguf
+[10-18 16:11:53] phase Y: missing C:\Users\patri\Documents\Codex\models\gguf\phaseY\Q4_K_M.gguf
+[10-18 16:11:53] phase Y: missing C:\Users\patri\Documents\Codex\models\gguf\phaseY\Q4_K_M-f16eo.gguf
+[10-18 16:11:53] phase Y: missing C:\Users\patri\Documents\Codex\models\gguf\phaseY\Q4_0.gguf
+[10-18 16:11:53] phase Y: missing C:\Users\patri\Documents\Codex\models\gguf\phaseY\Q5_K_M.gguf
+[10-18 16:11:53] phase Y: missing C:\Users\patri\Documents\Codex\models\gguf\phaseY\Q6_K.gguf
+[10-18 16:12:04] server y-merged-q4km pid=19448 port=8096 vram_delta=9316 MiB
+[10-18 16:13:12] gsm8k diag:y-merged-q4km:greedy: {"env": "gsm8k", "label": "diag:y-merged-q4km:greedy", "n_samples": 100, "score_mean": 0.86, "score_ci95": 0.0684, "reward_mean": 0.86, "completion_tokens_mean": 121.7, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 200.6} (68s)
+[10-18 16:13:23] server y-merged-q8 pid=21908 port=8096 vram_delta=12530 MiB
+[10-18 16:14:34] gsm8k diag:y-merged-q8:greedy: {"env": "gsm8k", "label": "diag:y-merged-q8:greedy", "n_samples": 100, "score_mean": 0.89, "score_ci95": 0.0616, "reward_mean": 0.89, "completion_tokens_mean": 121.4, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 178.2} (71s)
+[10-18 16:14:37] phase Y: done
+[10-18 16:14:50] phase Y: convert C:\Users\patri\Documents\Codex\models\hf\models--Qwen--Qwen3-8B\snapshots\b968826d9c46dd6066d109eabc6255188de91218 -> C:\Users\patri\Documents\Codex\models\gguf\phaseY\Qwen3-8B-F16.gguf
+[10-18 16:16:22] phase Y: convert exit=0 size=15.26 GB
+[10-18 16:19:22] phase Y: quantize Q4_K_M Q4_K_M.gguf exit=0 size=4.68 GB
+[10-18 16:21:54] phase Y: quantize Q4_K_M Q4_K_M-f16eo.gguf exit=0 size=6.2 GB
+[10-18 16:23:08] phase Y: quantize Q4_0 Q4_0.gguf exit=0 size=4.45 GB
+[10-18 16:25:34] phase Y: quantize Q5_K_M Q5_K_M.gguf exit=0 size=5.45 GB
+[10-18 16:27:56] phase Y: quantize Q6_K Q6_K.gguf exit=0 size=6.26 GB
+[10-18 16:28:06] server y-own-q4km-base pid=38968 port=8096 vram_delta=9316 MiB
+[10-18 16:30:15] gsm8k diag:y-own-q4km-base:greedy: {"env": "gsm8k", "label": "diag:y-own-q4km-base:greedy", "n_samples": 100, "score_mean": 0.95, "score_ci95": 0.0429, "reward_mean": 0.95, "completion_tokens_mean": 250.3, "truncated_frac": 0.01, "agg_tokens_per_s_this_run": 200.4} (130s)
+[10-18 16:30:27] server y-own-q4km-metamath pid=21208 port=8096 vram_delta=9474 MiB
+[10-18 16:32:26] gsm8k diag:y-own-q4km-metamath:greedy: {"env": "gsm8k", "label": "diag:y-own-q4km-metamath:greedy", "n_samples": 100, "score_mean": 0.86, "score_ci95": 0.0684, "reward_mean": 0.86, "completion_tokens_mean": 118.9, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 102.6} (119s)
+[10-18 16:32:37] server y-q4km-f16eo-metamath pid=14520 port=8096 vram_delta=10218 MiB
+[10-18 16:34:38] gsm8k diag:y-q4km-f16eo-metamath:greedy: {"env": "gsm8k", "label": "diag:y-q4km-f16eo-metamath:greedy", "n_samples": 100, "score_mean": 0.88, "score_ci95": 0.064, "reward_mean": 0.88, "completion_tokens_mean": 117.5, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 99.3} (121s)
+[10-18 16:34:49] server y-q4_0-metamath pid=40168 port=8096 vram_delta=9278 MiB
+[10-18 16:36:38] gsm8k diag:y-q4_0-metamath:greedy: {"env": "gsm8k", "label": "diag:y-q4_0-metamath:greedy", "n_samples": 100, "score_mean": 0.8, "score_ci95": 0.0788, "reward_mean": 0.8, "completion_tokens_mean": 123.2, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 116.4} (109s)
+[10-18 16:36:49] server y-q5km-metamath pid=41728 port=8096 vram_delta=10230 MiB
+[10-18 16:38:56] gsm8k diag:y-q5km-metamath:greedy: {"env": "gsm8k", "label": "diag:y-q5km-metamath:greedy", "n_samples": 100, "score_mean": 0.86, "score_ci95": 0.0684, "reward_mean": 0.86, "completion_tokens_mean": 121.5, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 97.8} (127s)
+[10-18 16:39:08] server y-q6k-metamath pid=5744 port=8096 vram_delta=11079 MiB
+[10-18 16:41:32] gsm8k diag:y-q6k-metamath:greedy: {"env": "gsm8k", "label": "diag:y-q6k-metamath:greedy", "n_samples": 100, "score_mean": 0.84, "score_ci95": 0.0722, "reward_mean": 0.84, "completion_tokens_mean": 118.7, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 85.2} (144s)
+[10-18 16:41:43] server y-merged-q4km pid=14024 port=8096 vram_delta=9316 MiB
+[10-18 16:41:49] gsm8k diag:y-merged-q4km:greedy: {"env": "gsm8k", "label": "diag:y-merged-q4km:greedy", "n_samples": 100, "score_mean": 0.86, "score_ci95": 0.0684, "reward_mean": 0.86, "completion_tokens_mean": 121.7, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": null} (6s)
+[10-18 16:42:05] server y-merged-q8 pid=42544 port=8096 vram_delta=12528 MiB
+[10-18 16:42:10] gsm8k diag:y-merged-q8:greedy: {"env": "gsm8k", "label": "diag:y-merged-q8:greedy", "n_samples": 100, "score_mean": 0.89, "score_ci95": 0.0616, "reward_mean": 0.89, "completion_tokens_mean": 121.4, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": null} (6s)
+[10-18 16:42:13] phase Y: done
+[10-18 16:42:40] server y-cpu-q4km-metamath pid=27936 port=8096 vram_delta=0 MiB
+[10-18 16:49:20] gsm8k diag:y-cpu-q4km-metamath:greedy: {"env": "gsm8k", "label": "diag:y-cpu-q4km-metamath:greedy", "n_samples": 30, "score_mean": 0.4667, "score_ci95": 0.1816, "reward_mean": 0.4667, "completion_tokens_mean": 238.3, "truncated_frac": 0.1667, "agg_tokens_per_s_this_run": 18.3} (400s)
+[10-18 16:49:24] phase Y3 (cpu): done
+[10-18 16:50:13] phase Z: start own-Q4_K_M server (exact Qwen/Qwen3-8B basis) with online + our adapters
+[10-18 16:50:24] server q4own pid=16240 port=8096 vram_delta=9987 MiB
+[10-18 16:55:04] reverse-text q4own-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "reverse-text", "label": "q4own-base", "n_samples": 200, "score_mean": 0.2077, "score_ci95": 0.0328, "reward_mean": 0.2077, "completion_tokens_mean": 224.5, "truncated_frac": 0.47, "agg_tokens_per_s_this_run": 170.7} (280s)
+[10-18 17:00:52] gsm8k q4own-base: {"env": "gsm8k", "label": "q4own-base", "n_samples": 200, "score_mean": 0.94, "score_ci95": 0.033, "reward_mean": 0.94, "completion_tokens_mean": 255.4, "truncated_frac": 0.01, "agg_tokens_per_s_this_run": 150.6} (347s)
+[10-18 17:03:08] medmcqa q4own-base: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4own-base", "n_samples": 200, "score_mean": 0.56, "score_ci95": 0.069, "reward_mean": 0.5097, "completion_tokens_mean": 87.7, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 147.5} (136s)
+[10-18 17:10:10] ifeval q4own-base: {"env": "ifeval", "label": "q4own-base", "n_samples": 200, "score_mean": 0.685, "score_ci95": 0.0645, "reward_mean": 0.685, "completion_tokens_mean": 268.9, "truncated_frac": 0.11, "agg_tokens_per_s_this_run": 131.3} (422s)
+[10-18 17:10:10] lora scales: 0:1.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for gsm8k-grpo on q4own
+[10-18 17:37:05] gsm8k q4own+online:gsm8k-grpo: {"env": "gsm8k", "label": "q4own+online:gsm8k-grpo", "n_samples": 200, "score_mean": 0.54, "score_ci95": 0.0692, "reward_mean": 0.54, "completion_tokens_mean": 768.0, "truncated_frac": 1.0, "agg_tokens_per_s_this_run": 95.6} (1,615s)
+[10-18 17:37:05] lora scales: 0:0.0 1:1.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for gsm8k-metamath on q4own
+[10-18 17:42:06] gsm8k q4own+online:gsm8k-metamath: {"env": "gsm8k", "label": "q4own+online:gsm8k-metamath", "n_samples": 200, "score_mean": 0.86, "score_ci95": 0.0482, "reward_mean": 0.86, "completion_tokens_mean": 119.1, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 81.5} (301s)
+[10-18 17:42:06] lora scales: 0:0.0 1:0.0 2:1.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for medmcqa-vireshk on q4own
+[10-18 17:47:24] medmcqa q4own+online:medmcqa-vireshk: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4own+online:medmcqa-vireshk", "n_samples": 200, "score_mean": 0.085, "score_ci95": 0.0387, "reward_mean": 0.0761, "completion_tokens_mean": 140.9, "truncated_frac": 0.085, "agg_tokens_per_s_this_run": 93.6} (318s)
+[10-18 17:47:24] lora scales: 0:0.0 1:0.0 2:0.0 3:1.0 4:0.0 5:0.0 6:0.0 7:0.0 for ifeval-tulu on q4own

@@ -1,0 +1,29 @@
+{
+  "env": "medmcqa",
+  "split": "eval",
+  "label": "q4own+online:medmcqa-vireshk",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.085,
+  "score_ci95": 0.0387,
+  "reward_mean": 0.0761,
+  "metrics_mean": {
+    "accuracy_reward": 0.085,
+    "thinking_reward": 0.083,
+    "boxed_reward": 0.0
+  },
+  "completion_tokens_mean": 140.9,
+  "truncated_frac": 0.085,
+  "wall_s_this_run": 301.1,
+  "agg_tokens_per_s_this_run": 93.6,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 1024,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

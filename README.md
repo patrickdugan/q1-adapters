@@ -11,16 +11,22 @@ Headline (200 items per env; GSM8K/MedMCQA also at 500):
 
 | | Q4 Qwen3-1.7B (1.11 GB) | Q1 Bonsai 8B (1.16 GB) | Q1 + routed adapters (+4×87 MB) | Q4 Qwen3-8B (5.03 GB) |
 |---|---|---|---|---|
-| reverse-text | 0.079 | 0.115 | **0.817** | 0.178 |
-| gsm8k | 0.800 | 0.845 | 0.875 | **0.945** |
-| medmcqa | 0.425 | 0.375 | 0.440 | **0.515** |
-| ifeval | 0.590 | 0.640 | 0.640 | **0.680** |
-| macro | 0.474 | 0.494 | **0.693** | 0.580 |
+| reverse-text | 0.079 | 0.115 | **0.817** | 0.208 |
+| gsm8k | 0.800 | 0.845 | 0.875 | **0.940** |
+| medmcqa | 0.425 | 0.375 | 0.440 | **0.560** |
+| ifeval | 0.590 | 0.640 | 0.640 | **0.685** |
+| macro | 0.474 | 0.494 | **0.693** | 0.598 |
 | GPU decode | 320 tok/s | 201 tok/s | — | 89 tok/s |
 
-Also: a 72k-parameter TRM router dispatches the adapters at oracle level on full prompts; lexical LDT
-lattices hurt as hard filters; and public Qwen3-8B LoRAs collapse on llama.cpp `Q4_K_M` GGUFs while
-working on `Q8_0` and on NF4 + PEFT.
+Also:
+- a 72k-parameter TRM router dispatches the adapters at oracle level on full prompts; lexical LDT
+  lattices hurt as hard filters;
+- Qwen's official `Qwen3-8B-Q4_K_M.gguf` is built from an **AWQ-rescaled checkpoint**
+  (`general.name` "Qwen3 8B Awq Compatible Instruct"; norm weights differ 20–55%), so public LoRAs
+  trained on `Qwen/Qwen3-8B` are misapplied on it (MetaMathQA GSM8K 0.98 → 0.37) — on a `Q4_K_M`
+  converted from the real checkpoint they work (0.86); the 4-bit numbers above use that file;
+- even correctly applied, none of the four public adapters improved a Hub env's score (format
+  mismatch, a stop-token defect, plain trade-offs); the env-trained adapters did.
 
 ## Environments (scored by the env packages' own reward code)
 
