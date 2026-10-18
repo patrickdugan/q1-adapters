@@ -4,8 +4,9 @@ Task LoRAs on a natively 1-bit 8B model (PrismML **Bonsai 8B**, `Q1_0`, 1.16 GB)
 **Prime Intellect Environments Hub** rewards on one laptop GPU, benchmarked against a 4-bit
 **Qwen3-8B** (`Q4_K_M`, 5.03 GB) carrying community adapters found on the Hugging Face Hub.
 
-Paper draft: [`paper/q1_adapters.md`](paper/q1_adapters.md). Tables: [`results/tables.md`](results/tables.md),
-routing: [`results/routing.md`](results/routing.md).
+Paper draft: [PDF](paper/q1_adapters.pdf) · [Markdown](paper/q1_adapters.md). Tables:
+[`results/tables.md`](results/tables.md), routing: [`results/routing.md`](results/routing.md).
+Adapters (PEFT + GGUF): [huggingface.co/AlephFunk/bonsai-8b-prime-env-adapters](https://huggingface.co/AlephFunk/bonsai-8b-prime-env-adapters).
 
 Headline (200 items per env; GSM8K/MedMCQA also at 500):
 

@@ -9,3 +9,4 @@ _trainer/
 runs/servers/
 runs/*.out.log
 runs/smoke/
+paper/*.html
