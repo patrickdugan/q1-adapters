@@ -1,6 +1,6 @@
 # One gigabyte, many skills: task adapters on a 1-bit 8B model, scored on Prime Intellect environments
 
-**Patrick Dugan** (Morality Lab) · draft prepared with Claude · 2026-10-18
+**Patrick Dugan** (Red Team Gladiatorics) · draft prepared with Claude · 2026-10-18
 
 Code and per-sample results: <https://github.com/patrickdugan/q1-adapters> ·
 Adapters: <https://huggingface.co/AlephFunk/bonsai-8b-prime-env-adapters>
