@@ -7,7 +7,7 @@
     "q4_base": 0.20773005425839058,
     "q1_online": null,
     "q4_online": null,
-    "q4_bonsai_adapter": null,
+    "q4_bonsai_adapter": 0.2822038193785393,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.7016727188604507,
@@ -47,7 +47,7 @@
       "adapter": "q4own+online-gsm8k-metamath",
       "score": 0.86
     },
-    "q4_bonsai_adapter": null,
+    "q4_bonsai_adapter": 0.94,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.03,
@@ -111,7 +111,7 @@
       "adapter": "q4own+online-medmcqa-vireshk",
       "score": 0.085
     },
-    "q4_bonsai_adapter": null,
+    "q4_bonsai_adapter": 0.59,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.065,
@@ -171,8 +171,11 @@
       "adapter": "q1+online-ifeval-tulu",
       "score": 0.63
     },
-    "q4_online": null,
-    "q4_bonsai_adapter": null,
+    "q4_online": {
+      "adapter": "q4own+online-ifeval-tulu",
+      "score": 0.54
+    },
+    "q4_bonsai_adapter": 0.69,
     "delta_q1_ours_vs_q1_base": {
       "n": 200,
       "delta": 0.0,
@@ -197,12 +200,28 @@
         0.025
       ]
     },
+    "delta_q4_online_vs_q4_base": {
+      "n": 200,
+      "delta": -0.145,
+      "ci95": [
+        -0.2,
+        -0.09
+      ]
+    },
     "delta_q1_ours_vs_q4_base": {
       "n": 200,
       "delta": -0.045,
       "ci95": [
         -0.085,
         0.0
+      ]
+    },
+    "delta_q1_ours_vs_q4_online": {
+      "n": 200,
+      "delta": 0.1,
+      "ci95": [
+        0.045,
+        0.155
       ]
     }
   },

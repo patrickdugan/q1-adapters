@@ -1,9 +1,9 @@
 | env (metric) | n | Q4 1.7B base (1.11 GB) | Q1 8B base (1.16 GB) | Q1 + our adapter (1.25 GB) | Q1 + online Qwen3 adapter | Q4 8B base (5.03 GB) | Q4 8B + online adapter (5.11 GB) | Q4 8B + our Bonsai adapter |
 |---|---|---|---|---|---|---|---|---|
-| reverse-text (LCS ratio) | 200 | 0.079 | 0.115 | 0.817 | — | 0.208 | — | — |
-| gsm8k (accuracy) | 200 | 0.800 | 0.845 | 0.875 | 0.870 (gsm8k-grpo) | 0.940 | 0.860 (gsm8k-metamath) | — |
-| medmcqa (accuracy) | 200 | 0.425 | 0.375 | 0.440 | 0.420 (medmcqa-vireshk) | 0.560 | 0.085 (medmcqa-vireshk) | — |
-| ifeval (constraint pass rate) | 200 | 0.590 | 0.640 | 0.640 | 0.630 (ifeval-tulu) | 0.685 | — | — |
+| reverse-text (LCS ratio) | 200 | 0.079 | 0.115 | 0.817 | — | 0.208 | — | 0.282 |
+| gsm8k (accuracy) | 200 | 0.800 | 0.845 | 0.875 | 0.870 (gsm8k-grpo) | 0.940 | 0.860 (gsm8k-metamath) | 0.940 |
+| medmcqa (accuracy) | 200 | 0.425 | 0.375 | 0.440 | 0.420 (medmcqa-vireshk) | 0.560 | 0.085 (medmcqa-vireshk) | 0.590 |
+| ifeval (constraint pass rate) | 200 | 0.590 | 0.640 | 0.640 | 0.630 (ifeval-tulu) | 0.685 | 0.540 (ifeval-tulu) | 0.690 |
 
 Q4 8B columns above: our own Q4_K_M from the exact Qwen/Qwen3-8B weights. Qwen's official Qwen3-8B-Q4_K_M.gguf (general.name 'Qwen3 8B Awq Compatible Instruct'; AWQ-rescaled norms) for comparison:
 
@@ -33,7 +33,9 @@ Paired deltas (same examples, same seeds; bootstrap 95% CI):
 - ifeval q1 base vs q4 1.7b base: +0.050 [-0.005, +0.105] (n=200)
 - ifeval q1 online vs q1 base: -0.010 [-0.050, +0.025] (n=200)
 - ifeval q1 ours vs q1 base: +0.000 [-0.045, +0.040] (n=200)
+- ifeval q4 online vs q4 base: -0.145 [-0.200, -0.090] (n=200)
 - ifeval q1 ours vs q4 base: -0.045 [-0.085, +0.000] (n=200)
+- ifeval q1 ours vs q4 online: +0.100 [+0.045, +0.155] (n=200)
 
 Extended evaluation, 500 examples (configurations run to 500; each row averaged over the ids all of its present configurations share):
 
@@ -89,6 +91,7 @@ Served throughput during the eval runs (6 concurrent requests, aggregate decode 
 | reverse-text | q4+bonsai-adapter | 64 |
 | reverse-text | q4-1.7b-base | 595 |
 | reverse-text | q4-base | 52 |
+| reverse-text | q4own+bonsai-adapter | 108 |
 | reverse-text | q4own-base | 171 |
 | gsm8k | q1+online:gsm8k-grpo | 256 |
 | gsm8k | q1+online:gsm8k-metamath | 257 |
@@ -101,6 +104,7 @@ Served throughput during the eval runs (6 concurrent requests, aggregate decode 
 | gsm8k | q4+online:gsm8k-metamath | 58 |
 | gsm8k | q4-1.7b-base | 624 |
 | gsm8k | q4-base | 345 |
+| gsm8k | q4own+bonsai-adapter | 117 |
 | gsm8k | q4own+online:gsm8k-grpo | 96 |
 | gsm8k | q4own+online:gsm8k-metamath | 82 |
 | gsm8k | q4own-base | 151 |
@@ -113,6 +117,7 @@ Served throughput during the eval runs (6 concurrent requests, aggregate decode 
 | medmcqa | q4+online:medmcqa-vireshk | 71 |
 | medmcqa | q4-1.7b-base | 622 |
 | medmcqa | q4-base | 538 |
+| medmcqa | q4own+bonsai-adapter | 105 |
 | medmcqa | q4own+online:medmcqa-vireshk | 94 |
 | medmcqa | q4own-base | 148 |
 | ifeval | q1+ours:gsm8k | 270 |
@@ -123,4 +128,6 @@ Served throughput during the eval runs (6 concurrent requests, aggregate decode 
 | ifeval | q4+online:ifeval-tulu | 48 |
 | ifeval | q4-1.7b-base | 551 |
 | ifeval | q4-base | 63 |
+| ifeval | q4own+bonsai-adapter | 83 |
+| ifeval | q4own+online:ifeval-tulu | 157 |
 | ifeval | q4own-base | 131 |

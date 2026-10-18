@@ -245,3 +245,30 @@
 [10-18 17:42:06] lora scales: 0:0.0 1:0.0 2:1.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for medmcqa-vireshk on q4own
 [10-18 17:47:24] medmcqa q4own+online:medmcqa-vireshk: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4own+online:medmcqa-vireshk", "n_samples": 200, "score_mean": 0.085, "score_ci95": 0.0387, "reward_mean": 0.0761, "completion_tokens_mean": 140.9, "truncated_frac": 0.085, "agg_tokens_per_s_this_run": 93.6} (318s)
 [10-18 17:47:24] lora scales: 0:0.0 1:0.0 2:0.0 3:1.0 4:0.0 5:0.0 6:0.0 7:0.0 for ifeval-tulu on q4own
+[10-18 19:25:18] server q4own2 pid=34228 port=8096 vram_delta=9988 MiB
+[10-18 19:25:18] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for f on q4own (try 0)
+[10-18 19:25:21] i q4own+online:f: Traceback (most recent call last): KeyError: 'i' (2s)
+[10-18 19:25:21] phase Z2: q4own+online-f incomplete (0/200) -- restarting server
+[10-18 19:25:30] server q4own2 pid=42628 port=8096 vram_delta=9988 MiB
+[10-18 19:25:30] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for f on q4own (try 1)
+[10-18 19:25:31] i q4own+online:f: Traceback (most recent call last): KeyError: 'i' (1s)
+[10-18 19:25:31] phase Z2: q4own+online-f incomplete (0/200) -- restarting server
+[10-18 19:25:41] server q4own2 pid=18988 port=8096 vram_delta=9988 MiB
+[10-18 19:25:41] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for f on q4own (try 0)
+[10-18 19:25:42] i q4own+online:f: Traceback (most recent call last): KeyError: 'i' (1s)
+[10-18 19:25:42] phase Z2: q4own+online-f incomplete (0/200) -- restarting server
+[10-18 19:25:51] server q4own2 pid=39284 port=8096 vram_delta=9988 MiB
+[10-18 19:25:51] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:0.0 for f on q4own (try 1)
+[10-18 19:25:53] i q4own+online:f: Traceback (most recent call last): KeyError: 'i' (1s)
+[10-18 19:25:53] phase Z2: q4own+online-f incomplete (0/200) -- restarting server
+[10-18 19:26:02] server q4own2 pid=37996 port=8096 vram_delta=9988 MiB
+[10-18 19:26:02] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:1.0 5:0.0 6:0.0 7:0.0 for ours-reverse-text on q4own (try 0)
+[10-18 19:29:11] reverse-text q4own+bonsai-adapter: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "reverse-text", "label": "q4own+bonsai-adapter", "n_samples": 200, "score_mean": 0.2822, "score_ci95": 0.0382, "reward_mean": 0.2822, "completion_tokens_mean": 96.6, "truncated_frac": 0.105, "agg_tokens_per_s_this_run": 108.3} (189s)
+[10-18 19:29:11] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:1.0 6:0.0 7:0.0 for ours-gsm8k on q4own (try 0)
+[10-18 19:36:20] gsm8k q4own+bonsai-adapter: {"env": "gsm8k", "label": "q4own+bonsai-adapter", "n_samples": 200, "score_mean": 0.94, "score_ci95": 0.033, "reward_mean": 0.94, "completion_tokens_mean": 246.7, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 117.2} (429s)
+[10-18 19:36:20] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:1.0 7:0.0 for ours-medmcqa on q4own (try 0)
+[10-18 19:39:56] medmcqa q4own+bonsai-adapter: RuntimeWarning: Enable tracemalloc to get the object allocation traceback {"env": "medmcqa", "label": "q4own+bonsai-adapter", "n_samples": 200, "score_mean": 0.59, "score_ci95": 0.0683, "reward_mean": 0.536, "completion_tokens_mean": 105.5, "truncated_frac": 0.0, "agg_tokens_per_s_this_run": 104.8} (216s)
+[10-18 19:39:56] lora scales: 0:0.0 1:0.0 2:0.0 3:0.0 4:0.0 5:0.0 6:0.0 7:1.0 for ours-ifeval on q4own (try 0)
+[10-18 19:51:17] ifeval q4own+bonsai-adapter: {"env": "ifeval", "label": "q4own+bonsai-adapter", "n_samples": 200, "score_mean": 0.69, "score_ci95": 0.0643, "reward_mean": 0.69, "completion_tokens_mean": 277.0, "truncated_frac": 0.105, "agg_tokens_per_s_this_run": 82.7} (681s)
+[10-18 19:51:29] phase Z2: done
+[10-18 19:56:43] ifeval q4own+online:ifeval-tulu: {"env": "ifeval", "label": "q4own+online:ifeval-tulu", "n_samples": 200, "score_mean": 0.54, "score_ci95": 0.0692, "reward_mean": 0.54, "completion_tokens_mean": 214.0, "truncated_frac": 0.06, "agg_tokens_per_s_this_run": 156.9} (288s)
