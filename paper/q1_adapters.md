@@ -126,8 +126,8 @@ Same 200 eval items per environment for every column (paired, same seeds); weigh
 | reverse-text (LCS) | 0.079 | 0.115 | **0.817** | — | 0.208 | — (none exists) |
 | gsm8k (accuracy) | 0.800 | 0.845 | 0.875 | 0.870 | **0.940** | 0.860 (MetaMathQA) |
 | medmcqa (accuracy) | 0.425 | 0.375 | 0.440 | 0.420 | **0.560** | 0.085 (MedMCQA LoRA)⁴ |
-| ifeval (pass rate) | 0.590 | 0.640 | 0.640 | 0.630 | **0.685** | 0.512 on 86 items, base 0.709 on the same (Tulu IF)⁵ |
-| **macro** | 0.474 | 0.494 | **0.693**¹ | — | 0.598 | ≈0.42² |
+| ifeval (pass rate) | 0.590 | 0.640 | 0.640 | 0.630 | **0.685** | 0.540 (Tulu IF) |
+| **macro** | 0.474 | 0.494 | **0.693**¹ | — | 0.598 | 0.423² |
 
 ¹ With each prompt routed to its adapter — exactly what the 72k-parameter TRM router achieves on
 full prompts (§3.5). ² Using the Q4 base for reverse-text, where no public adapter exists.
@@ -135,7 +135,7 @@ full prompts (§3.5). ² Using the Q4 base for reverse-text, where no public ada
 on. Qwen's official `Qwen3-8B-Q4_K_M.gguf` (5.03 GB) is built from an AWQ-rescaled checkpoint and
 misapplies those adapters (§3.6); its base scores are 0.178 / 0.945 / 0.515 / 0.680 on these items.
 ⁴ Right letter 58.5% of the time, but in the adapter's own bare-letter format, which the env's
-`\boxed{}` parser rejects (§3.6). ⁵ Run still in flight when the GPU throttled (§5).
+`\boxed{}` parser rejects (§3.6).
 
 GSM8K and MedMCQA, extended to 500 items (paired bootstrap 95% CIs):
 
@@ -257,7 +257,7 @@ Paired deltas, 1-bit Bonsai + our adapter minus 4-bit Qwen3-8B (our `Q4_K_M` fro
 | reverse-text | **0.817** | 0.208 | **+0.609** [+0.577, +0.644] | — (none exists) | — |
 | gsm8k | 0.875 | **0.940** | **−0.065** [−0.110, −0.020] | 0.860 (MetaMathQA) | +0.015 [−0.035, +0.070] |
 | medmcqa | 0.440 | **0.560** | **−0.120** [−0.200, −0.030] | 0.085 (MedMCQA LoRA; format) | +0.355 [+0.275, +0.440] |
-| ifeval | 0.640 | **0.685** | −0.045 [−0.085, +0.000] | 0.512 (Tulu IF; 86 items) | — |
+| ifeval | 0.640 | **0.685** | −0.045 [−0.085, +0.000] | 0.540 (Tulu IF) | +0.100 [+0.045, +0.155] |
 
 Read honestly, this is two results:
 
@@ -310,7 +310,12 @@ were trained on (200 items, env sampling, as the main table):
 | MetaMathQA (tianzl66) | gsm8k | 0.940 → 0.860 | −0.080 [−0.130, −0.030] | 0.425 | nothing — it runs as its author reports (0.84) and is simply weaker than Qwen3-8B's own non-thinking GSM8K |
 | GRPO GSM8K (Pradheep1647) | gsm8k | 0.940 → 0.540 | −0.400 [−0.470, −0.330] | 0.25 | never learned to stop: loops after `#### N` on every backend |
 | MedMCQA QLoRA (vireshk) | medmcqa | 0.560 → 0.085 | −0.475 [−0.550, −0.400] | 0.475 | answers in its training format — a bare letter, then an explanation — which the env's `\boxed{}` parser rejects; by letter it is right 58.5% of the time (base 56.0%) |
-| Tulu IF (tianzl66) | ifeval | 0.709 → 0.512 (86 items so far) | −0.198 [−0.279, −0.116] | 0.375 | a weak adapter for this env at any precision |
+| Tulu IF (tianzl66) | ifeval | 0.685 → 0.540 | −0.145 [−0.200, −0.090] | 0.375 | a weak adapter for this env at any precision |
+
+Our Bonsai adapters, by contrast, transfer *positively* to the correctly built Qwen3-8B `Q4_K_M` — the
+two models share an architecture and, it appears, enough weight geometry: reverse-text 0.208 → 0.282,
+MedMCQA 0.560 → 0.590, GSM8K 0.940 → 0.940, IFEval 0.685 → 0.690 (on the AWQ-rescaled official file the
+same adapters were neutral to harmful: 0.093 / 0.940 / 0.510 / 0.660).
 
 So correcting the basis rescues the adapters' *intended* behaviour, and it still does not make
 them useful here. A community adapter brings the contract of whatever it was trained on — its answer
@@ -400,8 +405,7 @@ fit at all.
   varies (the Tulu IF adapter is weak at any precision; the GRPO adapter never learned to stop). The
   official-GGUF mechanism is established for one adapter in depth (MetaMathQA: eight quantization /
   runtime / merge variants, CPU and CUDA, NF4 + PEFT) and checked by norm-weight comparison; the
-  diagnostic grids used 100 items (60 for NF4, 30 for CPU). The Tulu IF run on the correct-basis file
-  had 86 of 200 items when the GPU throttled, and our own Bonsai adapters were not re-run on it.
+  diagnostic grids used 100 items (60 for NF4, 30 for CPU).
 - **One machine, noisy conditions.** An RTX 5080 Laptop shared with other jobs at times. Served
   throughput numbers were taken under that sharing and under a recurring software power cap (P-states
   P2–P8 at ~35–40 W even on AC power) that also caused Windows TDR GPU resets; the speed table uses
