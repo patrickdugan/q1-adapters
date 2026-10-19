@@ -1,0 +1,78 @@
+{
+  "env": "pubmedqa",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\rft\\pubmedqa-q1-base.jsonl"
+  ],
+  "n_samples": 1600,
+  "n_selected": 556,
+  "n_train_items": 556,
+  "skipped_over_max_len": 0,
+  "min_score": 1.0,
+  "per_prompt": 2,
+  "epochs": 2.0,
+  "lr": 0.0001,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 70,
+  "train_wall_s": 2171,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 0.2802
+    },
+    {
+      "step": 10,
+      "loss": 0.2612
+    },
+    {
+      "step": 15,
+      "loss": 0.2482
+    },
+    {
+      "step": 20,
+      "loss": 0.2508
+    },
+    {
+      "step": 25,
+      "loss": 0.2374
+    },
+    {
+      "step": 30,
+      "loss": 0.235
+    },
+    {
+      "step": 35,
+      "loss": 0.236
+    },
+    {
+      "step": 40,
+      "loss": 0.2149
+    },
+    {
+      "step": 45,
+      "loss": 0.2263
+    },
+    {
+      "step": 50,
+      "loss": 0.2095
+    },
+    {
+      "step": 55,
+      "loss": 0.2219
+    },
+    {
+      "step": 60,
+      "loss": 0.2144
+    },
+    {
+      "step": 65,
+      "loss": 0.21
+    },
+    {
+      "step": 70,
+      "loss": 0.2128
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\pubmedqa",
+  "gguf_bytes": 87328928
+}

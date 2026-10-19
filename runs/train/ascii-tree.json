@@ -1,0 +1,142 @@
+{
+  "env": "ascii-tree",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\sft\\ascii-tree-gold.jsonl"
+  ],
+  "n_samples": 800,
+  "n_selected": 800,
+  "n_train_items": 800,
+  "skipped_over_max_len": 0,
+  "min_score": 0.99,
+  "per_prompt": 1,
+  "epochs": 3.0,
+  "lr": 0.0002,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 150,
+  "train_wall_s": 5229,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 0.4949
+    },
+    {
+      "step": 10,
+      "loss": 0.2966
+    },
+    {
+      "step": 15,
+      "loss": 0.1428
+    },
+    {
+      "step": 20,
+      "loss": 0.1129
+    },
+    {
+      "step": 25,
+      "loss": 0.06
+    },
+    {
+      "step": 30,
+      "loss": 0.0408
+    },
+    {
+      "step": 35,
+      "loss": 0.0104
+    },
+    {
+      "step": 40,
+      "loss": 0.0111
+    },
+    {
+      "step": 45,
+      "loss": 0.0113
+    },
+    {
+      "step": 50,
+      "loss": 0.0094
+    },
+    {
+      "step": 55,
+      "loss": 0.0136
+    },
+    {
+      "step": 60,
+      "loss": 0.0011
+    },
+    {
+      "step": 65,
+      "loss": 0.0076
+    },
+    {
+      "step": 70,
+      "loss": 0.0013
+    },
+    {
+      "step": 75,
+      "loss": 0.0068
+    },
+    {
+      "step": 80,
+      "loss": 0.0056
+    },
+    {
+      "step": 85,
+      "loss": 0.0002
+    },
+    {
+      "step": 90,
+      "loss": 0.0051
+    },
+    {
+      "step": 95,
+      "loss": 0.0007
+    },
+    {
+      "step": 100,
+      "loss": 0.0016
+    },
+    {
+      "step": 105,
+      "loss": 0.002
+    },
+    {
+      "step": 110,
+      "loss": 0.0005
+    },
+    {
+      "step": 115,
+      "loss": 0.0036
+    },
+    {
+      "step": 120,
+      "loss": 0.0005
+    },
+    {
+      "step": 125,
+      "loss": 0.0016
+    },
+    {
+      "step": 130,
+      "loss": 0.0015
+    },
+    {
+      "step": 135,
+      "loss": 0.0002
+    },
+    {
+      "step": 140,
+      "loss": 0.0012
+    },
+    {
+      "step": 145,
+      "loss": 0.0004
+    },
+    {
+      "step": 150,
+      "loss": 0.0004
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\ascii-tree",
+  "gguf_bytes": 87328928
+}

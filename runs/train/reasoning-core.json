@@ -1,0 +1,142 @@
+{
+  "env": "reasoning-core",
+  "data": [
+    "C:\\Users\\patri\\OneDrive\\Documents\\GitHub\\q1-adapters\\runs\\sft\\reasoning-core-gold.jsonl"
+  ],
+  "n_samples": 800,
+  "n_selected": 800,
+  "n_train_items": 798,
+  "skipped_over_max_len": 2,
+  "min_score": 0.99,
+  "per_prompt": 1,
+  "epochs": 3.0,
+  "lr": 0.0002,
+  "rank": 16,
+  "effective_batch": 16,
+  "steps": 150,
+  "train_wall_s": 3294,
+  "loss": [
+    {
+      "step": 5,
+      "loss": 0.8314
+    },
+    {
+      "step": 10,
+      "loss": 0.8713
+    },
+    {
+      "step": 15,
+      "loss": 0.5435
+    },
+    {
+      "step": 20,
+      "loss": 0.6399
+    },
+    {
+      "step": 25,
+      "loss": 0.5698
+    },
+    {
+      "step": 30,
+      "loss": 0.4783
+    },
+    {
+      "step": 35,
+      "loss": 0.5872
+    },
+    {
+      "step": 40,
+      "loss": 0.535
+    },
+    {
+      "step": 45,
+      "loss": 0.4294
+    },
+    {
+      "step": 50,
+      "loss": 0.6057
+    },
+    {
+      "step": 55,
+      "loss": 0.2818
+    },
+    {
+      "step": 60,
+      "loss": 0.3194
+    },
+    {
+      "step": 65,
+      "loss": 0.2927
+    },
+    {
+      "step": 70,
+      "loss": 0.268
+    },
+    {
+      "step": 75,
+      "loss": 0.2428
+    },
+    {
+      "step": 80,
+      "loss": 0.3077
+    },
+    {
+      "step": 85,
+      "loss": 0.3289
+    },
+    {
+      "step": 90,
+      "loss": 0.2982
+    },
+    {
+      "step": 95,
+      "loss": 0.3131
+    },
+    {
+      "step": 100,
+      "loss": 0.3059
+    },
+    {
+      "step": 105,
+      "loss": 0.1494
+    },
+    {
+      "step": 110,
+      "loss": 0.1431
+    },
+    {
+      "step": 115,
+      "loss": 0.1551
+    },
+    {
+      "step": 120,
+      "loss": 0.2081
+    },
+    {
+      "step": 125,
+      "loss": 0.134
+    },
+    {
+      "step": 130,
+      "loss": 0.1572
+    },
+    {
+      "step": 135,
+      "loss": 0.1531
+    },
+    {
+      "step": 140,
+      "loss": 0.1445
+    },
+    {
+      "step": 145,
+      "loss": 0.1432
+    },
+    {
+      "step": 150,
+      "loss": 0.1614
+    }
+  ],
+  "adapter_dir": "C:\\Users\\patri\\Documents\\Codex\\models\\q1-adapters\\reasoning-core",
+  "gguf_bytes": 87328928
+}

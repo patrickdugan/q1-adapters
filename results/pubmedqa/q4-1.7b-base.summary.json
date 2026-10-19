@@ -1,0 +1,31 @@
+{
+  "env": "pubmedqa",
+  "split": "eval",
+  "label": "q4-1.7b-base",
+  "n_examples": 500,
+  "k": 1,
+  "n_samples": 500,
+  "score_mean": 0.39,
+  "score_ci95": 0.0428,
+  "reward_mean": 0.4385,
+  "metrics_mean": {
+    "accuracy_reward": 0.39,
+    "partial_match_reward": 0.512,
+    "format_reward": 0.7505,
+    "thinking_reward": 0.03,
+    "evidence_analysis_reward": 0.7518
+  },
+  "completion_tokens_mean": 174.6,
+  "truncated_frac": 0.0,
+  "wall_s_this_run": 188.2,
+  "agg_tokens_per_s_this_run": 463.8,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 1024,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

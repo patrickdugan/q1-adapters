@@ -52,6 +52,26 @@ Extended evaluation, 500 examples (configurations run to 500; each row averaged 
 - medmcqa (n=500) Q1 + our adapter vs Q4 1.7B base: +0.058 [+0.010, +0.106]
 - medmcqa (n=500) Q1 + our adapter vs Q4 8B base: -0.068 [-0.122, -0.014]
 
+Phase N: bigger samples and more Prime Intellect Hub environments, ordered roughly by reasoning load (non-thinking mode; every row averaged over the ids all of its configurations answered):
+
+| env (metric) | n | Q4 1.7B base (1.11 GB) | Q1 8B base (1.16 GB) | Q1 + our adapter | Q4 8B base (5.03 GB) | Q1 − Q4 1.7B | Q1 − Q4 8B |
+|---|---|---|---|---|---|---|---|
+| gsm8k (accuracy, full test) | 1319 | 0.798 | 0.851 | 0.871 | 0.933 | +0.053 [+0.030, +0.076] | -0.081 [-0.099, -0.063] |
+| medmcqa (accuracy) | 1000 | 0.437 | 0.409 | 0.453 | 0.567 | -0.028 [-0.062, +0.008] | -0.158 [-0.194, -0.121] |
+| pubmedqa (accuracy) | 500 | 0.390 | 0.364 | 0.434 | 0.432 | -0.026 [-0.074, +0.018] | -0.068 [-0.110, -0.028] |
+| ascii-tree (weighted tree similarity) | 200 | 0.106 | 0.062 | 0.981 | 0.230 | -0.044 [-0.070, -0.019] | -0.168 [-0.202, -0.133] |
+| math500 (accuracy) | 500 | 0.710 | 0.642 | 0.630 | 0.810 | -0.068 [-0.108, -0.030] | -0.168 [-0.206, -0.130] |
+| reasoning-core (task score) | 500 | 0.175 | 0.220 | 0.300 | 0.256 | +0.045 [+0.010, +0.079] | -0.036 [-0.074, +0.002] |
+| aime (avg@2; pass@2 in brackets) | 60 | 0.117 [0.167] | 0.067 [0.083] | — | 0.242 [0.300] | -0.050 [-0.117, +0.017] | -0.175 [-0.267, -0.092] |
+
+Our adapters in phase N: the GSM8K adapter on gsm8k / math500 / aime, the MedMCQA adapter on medmcqa, phase N2 adapters on pubmedqa (rejection sampling), ascii-tree and reasoning-core (gold SFT); paired deltas vs Q1 base:
+- gsm8k: +0.020 [+0.002, +0.038] (n=1319)
+- medmcqa: +0.044 [+0.015, +0.073] (n=1000)
+- pubmedqa: +0.070 [+0.030, +0.110] (n=500)
+- ascii-tree: +0.919 [+0.899, +0.936] (n=200)
+- math500: -0.012 [-0.052, +0.026] (n=500)
+- reasoning-core: +0.080 [+0.038, +0.119] (n=500)
+
 llama-bench (PrismML fork build 10743; GPU = RTX 5080 Laptop, -ngl 99; CPU = 8 threads):
 
 | model | device | test | tokens/s | model size (GB) |
@@ -98,28 +118,30 @@ Served throughput during the eval runs (6 concurrent requests, aggregate decode 
 | gsm8k | q1+ours:ifeval | 315 |
 | gsm8k | q1+ours:medmcqa | 302 |
 | gsm8k | q1+ours:reverse-text | 199 |
-| gsm8k | q1+ours | 257 |
+| gsm8k | q1+ours | 251 |
+| gsm8k | q1-base | 580 |
 | gsm8k | q4+bonsai-adapter | 85 |
 | gsm8k | q4+online:gsm8k-grpo | 120 |
 | gsm8k | q4+online:gsm8k-metamath | 58 |
-| gsm8k | q4-1.7b-base | 624 |
+| gsm8k | q4-1.7b-base | 938 |
 | gsm8k | q4-base | 345 |
 | gsm8k | q4own+bonsai-adapter | 117 |
 | gsm8k | q4own+online:gsm8k-grpo | 96 |
 | gsm8k | q4own+online:gsm8k-metamath | 82 |
-| gsm8k | q4own-base | 151 |
+| gsm8k | q4own-base | 248 |
 | medmcqa | q1+online:medmcqa-vireshk | 230 |
 | medmcqa | q1+ours:gsm8k | 296 |
 | medmcqa | q1+ours:ifeval | 152 |
 | medmcqa | q1+ours:reverse-text | 301 |
-| medmcqa | q1+ours | 251 |
+| medmcqa | q1+ours | 305 |
+| medmcqa | q1-base | 684 |
 | medmcqa | q4+bonsai-adapter | 101 |
 | medmcqa | q4+online:medmcqa-vireshk | 71 |
-| medmcqa | q4-1.7b-base | 622 |
+| medmcqa | q4-1.7b-base | 1145 |
 | medmcqa | q4-base | 538 |
 | medmcqa | q4own+bonsai-adapter | 105 |
 | medmcqa | q4own+online:medmcqa-vireshk | 94 |
-| medmcqa | q4own-base | 148 |
+| medmcqa | q4own-base | 240 |
 | ifeval | q1+ours:gsm8k | 270 |
 | ifeval | q1+ours:medmcqa | 287 |
 | ifeval | q1+ours:reverse-text | 244 |

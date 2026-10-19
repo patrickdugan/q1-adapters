@@ -68,6 +68,101 @@ def best_online(env: str, prefix: str):
     return best
 
 
+def load_avg(env: str, stem: str) -> tuple[dict[str, float], dict[str, float]] | None:
+    """Per-id mean over all k samples (avg@k) and per-id best (pass@k)."""
+    f = RES / env / f"{stem}.jsonl"
+    if not f.exists():
+        return None
+    by: dict[str, list[float]] = {}
+    for x in f.read_text(encoding="utf-8").split("\n"):
+        if x.strip():
+            r = json.loads(x)
+            by.setdefault(r["id"], []).append(r["score"])
+    return {i: sum(v) / len(v) for i, v in by.items()}, {i: max(v) for i, v in by.items()}
+
+
+# Phase N: larger samples on two original envs and five more Hub envs. Reasoning load rises down the table.
+PHASE_N = [("gsm8k", "accuracy, full test", "q1+ours"), ("medmcqa", "accuracy", "q1+ours"),
+           ("pubmedqa", "accuracy", "q1+ours"), ("ascii-tree", "weighted tree similarity", "q1+ours"),
+           ("math500", "accuracy", "q1+ours-gsm8k"), ("reasoning-core", "task score", "q1+ours"),
+           ("aime", "avg@2; pass@2 in brackets", None)]
+PN_COLS = {"q4-1.7b-base": "Q4 1.7B base (1.11 GB)", "q1-base": "Q1 8B base (1.16 GB)",
+           "ours": "Q1 + our adapter", "q4own-base": "Q4 8B base (5.03 GB)"}
+
+
+def phase_n(lines: list[str]) -> dict:
+    out = {}
+    lines += ["", "Phase N: bigger samples and more Prime Intellect Hub environments, ordered roughly by reasoning load "
+              "(non-thinking mode; every row averaged over the ids all of its configurations answered):", "",
+              "| env (metric) | n | " + " | ".join(PN_COLS.values()) + " | Q1 − Q4 1.7B | Q1 − Q4 8B |",
+              "|---|---|" + "---|" * (len(PN_COLS) + 2)]
+    for env, metric, ours in PHASE_N:
+        stems = {"q4-1.7b-base": "q4-1.7b-base", "q1-base": "q1-base", "ours": ours, "q4own-base": "q4own-base"}
+        ds, best = {}, {}
+        for col, stem in stems.items():
+            if stem and (got := load_avg(env, stem)):
+                ds[col], best[col] = got
+        # a run still in flight would shrink the common set: require the base columns to be complete
+        if not ds:
+            continue
+        need = max(len(d) for d in ds.values())
+        ds = {c: d for c, d in ds.items() if len(d) >= 0.98 * need}
+        best = {c: best[c] for c in ds}
+        common = set.intersection(*(set(d) for d in ds.values()))
+        ds = {c: {i: d[i] for i in common} for c, d in ds.items()}
+        best = {c: {i: d[i] for i in common} for c, d in best.items()}
+        row = {"n": len(common), "metric": metric}
+
+        def cell(c):
+            if c not in ds:
+                return "—"
+            s = f"{mean(ds[c]):.3f}"
+            return s + (f" [{mean(best[c]):.3f}]" if env == "aime" else "")
+
+        def dcell(a, b):
+            if a in ds and b in ds:
+                d = paired(ds[a], ds[b])
+                row[f"delta {b} vs {a}"] = d
+                return f"{d['delta']:+.3f} [{d['ci95'][0]:+.3f}, {d['ci95'][1]:+.3f}]"
+            return "—"
+        for c in ds:
+            row[c] = mean(ds[c])
+            if env == "aime":
+                row[c + " pass@2"] = mean(best[c])
+        d17, d8 = dcell("q4-1.7b-base", "q1-base"), dcell("q4own-base", "q1-base")
+        if "ours" in ds and "q1-base" in ds:
+            dcell("q1-base", "ours")
+        lines.append(f"| {env} ({metric}) | {len(common)} | " + " | ".join(cell(c) for c in PN_COLS) + f" | {d17} | {d8} |")
+        out[env] = row
+    lines.append("")
+    lines.append("Our adapters in phase N: the GSM8K adapter on gsm8k / math500 / aime, the MedMCQA adapter on medmcqa, "
+                 "phase N2 adapters on pubmedqa (rejection sampling), ascii-tree and reasoning-core (gold SFT); "
+                 "paired deltas vs Q1 base:")
+    for env, row in out.items():
+        d = row.get("delta ours vs q1-base")
+        if d:
+            lines.append(f"- {env}: {d['delta']:+.3f} [{d['ci95'][0]:+.3f}, {d['ci95'][1]:+.3f}] (n={d['n']})")
+    if out:
+        fig, ax = plt.subplots(figsize=(9, 4.0))
+        cols = [("q4-1.7b-base", "#6b4c9a"), ("q1-base", "#9aa5b1"), ("ours", "#1f6feb"), ("q4own-base", "#c9a227")]
+        envs = list(out)
+        w = 0.2
+        for j, (c, colr) in enumerate(cols):
+            xs = [i + (j - 1.5) * w for i, e in enumerate(envs) if c in out[e]]
+            ys = [out[e][c] for e in envs if c in out[e]]
+            ax.bar(xs, ys, w, color=colr, label=PN_COLS[c])
+        ax.set_xticks(range(len(envs)), [e if e != "aime" else "aime (avg@2)" for e in envs], rotation=0, fontsize=8)
+        ax.set_ylabel("score")
+        ax.set_ylim(0, 1)
+        ax.grid(axis="y", alpha=0.3)
+        ax.legend(ncol=4, fontsize=8, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.1))
+        ax.set_title("More Hub environments, ordered by reasoning load (non-thinking mode)", fontsize=10)
+        fig.tight_layout()
+        (RES / "figures").mkdir(parents=True, exist_ok=True)
+        fig.savefig(RES / "figures" / "phase_n_envs.png", dpi=150)
+    return out
+
+
 def main() -> int:
     summary, lines = {}, []
     lines.append("| env (metric) | n | Q4 1.7B base (1.11 GB) | Q1 8B base (1.16 GB) | Q1 + our adapter (1.25 GB) | "
@@ -172,6 +267,7 @@ def main() -> int:
                 ext_summary[env][f"delta {b} vs {a}"] = d
                 lines.append(f"- {env} (n={d['n']}) {ext[b]} vs {ext[a]}: {d['delta']:+.3f} [{d['ci95'][0]:+.3f}, {d['ci95'][1]:+.3f}]")
     summary["_extended_n500"] = ext_summary
+    summary["_phase_n"] = phase_n(lines)
 
     # speed: llama-bench (no adapter) and served throughput with/without an active adapter
     sp = RES / "speed"

@@ -17,16 +17,21 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from envs import get_env  # noqa: E402
 
-TARGETS = {"reverse-text": lambda ans: f"<reversed_text>\n{ans}\n</reversed_text>"}
+TARGETS = {"reverse-text": lambda ans: f"<reversed_text>\n{ans}\n</reversed_text>",
+           # ascii-tree: the gold tree in the <ascii_formatted> tags its XMLParser reads (a transformation skill)
+           "ascii-tree": lambda ans: f"<ascii_formatted>\n{ans}\n</ascii_formatted>",
+           # reasoning-core: the gold answer alone, no derivation -- tests whether a format-level adapter buys reasoning
+           "reasoning-core": lambda ans: f"<answer>{ans}</answer>"}
 
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--env", required=True, choices=sorted(TARGETS))
     p.add_argument("--out", required=True)
+    p.add_argument("--n", type=int, default=None, help="first N train rows only")
     args = p.parse_args(argv)
     env = get_env(args.env)
-    rows = env.examples("train")
+    rows = env.examples("train")[: args.n]
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8") as fh:

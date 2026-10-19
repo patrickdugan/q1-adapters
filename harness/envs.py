@@ -13,8 +13,14 @@ Envs (verifiers 0.3.x classic API unless noted):
   gsm8k          primeintellect/gsm8k         math-verify on '#### N' (verifiers v1 package;
                                               its verify.py is run in-process, its prompt read
                                               from the package source)
+  math500        primeintellect/math500       math-verify on the last \\boxed{} (v1 taskset; prompt and scorer
+                                              mirrored from the package, timeouts off as for gsm8k)
+  aime           primeintellect/aime2024+2025 math-verify on the boxed answer (v1 tasksets, mirrored)
+  pubmedqa       maziyar/OpenMed_PubMedQA     yes/no/maybe accuracy (+ env's weighted reward)
+  reasoning-core sileod/reasoning-core-env    the env's symbolic scorer (logic, planning, ...)
+  ascii-tree     primeintellect/ascii-tree    the env's weighted tree-similarity reward
 
-Runs in the ``vf`` venv (verifiers<0.4 + the four env packages).
+Runs in the ``vf`` venv (verifiers<0.4 + the env packages).
 """
 
 from __future__ import annotations
@@ -25,6 +31,7 @@ import contextlib
 import importlib.util
 import inspect
 import io
+import json
 import random
 import runpy
 import sys
@@ -88,7 +95,14 @@ class _ClassicEnv:
         out = []
         for i in idx:
             r = rows[i]
-            out.append(Example(self.name, f"{split}-{r.get('example_id', i)}", _as_messages(r["prompt"]), str(r["answer"])))
+            info = r.get("info") or {}
+            if isinstance(info, str):
+                try:
+                    info = json.loads(info)
+                except ValueError:
+                    info = {}
+            out.append(Example(self.name, f"{split}-{r.get('example_id', i)}", _as_messages(r["prompt"]), str(r["answer"]),
+                               {"info": info}))
         return out
 
     def score(self, text: str, ex: Example) -> dict:
@@ -98,13 +112,14 @@ class _ClassicEnv:
         for f, w in zip(self.funcs, self.weights):
             try:
                 metrics[f.__name__] = _call(f, completion=completion, answer=ex.answer, prompt=ex.messages,
-                                            parser=self.env.parser, state={}, info={}, task=self.name)
+                                            parser=self.env.parser, state={}, info=ex.meta.get("info", {}), task=self.name)
             except Exception:  # noqa: BLE001 - zero-weight monitor metrics may need rollout state we don't keep
                 if w:
                     raise
                 continue
             reward += w * metrics[f.__name__]
-        return {"score": metrics[self.primary], "reward": reward, "metrics": metrics}
+        # primary=None: the env's own weighted reward is the task score
+        return {"score": reward if self.primary is None else metrics[self.primary], "reward": reward, "metrics": metrics}
 
 
 class ReverseText(_ClassicEnv):
@@ -203,7 +218,142 @@ class GSM8K:
         return {"score": s, "reward": s, "metrics": {"correct": s}}
 
 
-ENVS = {"reverse-text": ReverseText, "medmcqa": MedMCQA, "ifeval": IFEval, "gsm8k": GSM8K}
+def _math_verify_boxed(prediction: str, gold: str) -> float:
+    """math-verify equivalence of two boxed expressions, with its signal/process timeouts disabled (Windows)."""
+    from math_verify import parse, verify
+
+    if not prediction or not gold:
+        return 0.0
+    try:
+        return 1.0 if verify(parse("\\boxed{" + gold + "}", parsing_timeout=None),
+                             parse("\\boxed{" + prediction + "}", parsing_timeout=None), timeout_seconds=None) else 0.0
+    except Exception:  # noqa: BLE001 - malformed answers can fail anywhere in math-verify
+        return 0.0
+
+
+def _boxed_v1(text: str, strict: bool = False) -> str:
+    """verifiers.v1.utils.score.extract_boxed_answer: contents of the last \\boxed{...}, braces balanced by hand."""
+    start = text.rfind("\\boxed{")
+    if start == -1:
+        return "" if strict else text
+    depth, i0 = 1, start + len("\\boxed{")
+    for i in range(i0, len(text)):
+        depth += {"{": 1, "}": -1}.get(text[i], 0)
+        if depth == 0:
+            return text[i0:i]
+    return "" if strict else text
+
+
+class Math500:
+    """primeintellect/math500 (verifiers-v1 taskset): prompt and scorer mirrored from the package —
+    problem + its instruction as one user turn; verify_boxed_math_answer on the last reply."""
+
+    name = "math500"
+    EVAL_DEFAULT = 500
+
+    # constants of math500/taskset.py (importing it pulls verifiers.v1, which needs fcntl: POSIX only)
+    DATASET, SPLIT, REVISION = "HuggingFaceH4/MATH-500", "test", "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be"
+    INSTRUCTION = "\nPlease reason step by step, and put your final answer within \\boxed{}."
+
+    def examples(self, split: str, n: int | None = None, seed: int = 0) -> list[Example]:
+        from datasets import load_dataset
+
+        if split != "eval":
+            raise ValueError("math500 is eval-only")
+        rows = load_dataset(self.DATASET, split=self.SPLIT, revision=self.REVISION)
+        k = min(len(rows), n or self.EVAL_DEFAULT)
+        return [Example(self.name, f"eval-{i}", [{"role": "user", "content": rows[i]["problem"] + self.INSTRUCTION}],
+                        str(rows[i]["answer"])) for i in range(k)]
+
+    def score(self, text: str, ex: Example) -> dict:
+        # verifiers.v1.utils.score.verify_boxed_math_answer, line for line, timeouts off
+        s = 0.0
+        if text and not ("<think>" in text and "</think>" not in text):
+            pred = _boxed_v1(text.rsplit("</think>", 1)[-1], strict=True).strip()
+            gold = (_boxed_v1(ex.answer, strict=True) or ex.answer).strip()
+            s = _math_verify_boxed(pred, gold)
+        return {"score": s, "reward": s, "metrics": {"correct": s}}
+
+
+class Aime:
+    """primeintellect/aime2024 + aime2025 (verifiers-v1 tasksets), 60 problems: their instruction + problem as the
+    user turn; MaybeThinkParser(extract_boxed_answer) then math-verify, as in the packages."""
+
+    name = "aime"
+    INSTR = "Solve the following math problem. Explain your reasoning and put the final answer in \\boxed{}.\n\n"
+
+    def examples(self, split: str, n: int | None = None, seed: int = 0) -> list[Example]:
+        from datasets import concatenate_datasets, load_dataset
+
+        if split != "eval":
+            raise ValueError("aime is eval-only")
+        out = []
+        a24 = load_dataset("HuggingFaceH4/aime_2024", split="train", revision="2fe88a2f1091d5048c0f36abc874fb997b3dd99a")
+        for i, r in enumerate(a24):
+            out.append(Example(self.name, f"eval-2024-{i}", [{"role": "user", "content": self.INSTR + r["problem"]}],
+                               str(int(r["answer"]))))
+        a25 = concatenate_datasets([load_dataset("opencompass/AIME2025", c, split="test",
+                                                 revision="a6ad95f611d72cf628a80b58bd0432ef6638f958")
+                                    for c in ("AIME2025-I", "AIME2025-II")])
+        for i, r in enumerate(a25):
+            ans = "".join(c for c in r["answer"] if c.isdigit() or c == ".")
+            out.append(Example(self.name, f"eval-2025-{i}", [{"role": "user", "content": self.INSTR + r["question"]}], ans))
+        return out[:n] if n else out
+
+    def score(self, text: str, ex: Example) -> dict:
+        import verifiers as vf
+        from verifiers.utils.data_utils import extract_boxed_answer
+
+        resp = vf.MaybeThinkParser(extract_boxed_answer).parse_answer([{"role": "assistant", "content": text or ""}])
+        s = 0.0 if (not resp or len(resp) > 50_000) else _math_verify_boxed(resp, ex.answer)
+        return {"score": s, "reward": s, "metrics": {"correct": s}}
+
+
+class PubMedQA(_ClassicEnv):
+    name = "pubmedqa"
+    primary = "accuracy_reward"
+
+    def _load(self):
+        import OpenMed_PubMedQA
+
+        return OpenMed_PubMedQA.load_environment()
+
+    def _rows(self, split, n=None):
+        if split == "eval":
+            return self.env.eval_dataset.select(range(min(len(self.env.eval_dataset), max(500, n or 0))))
+        return self.env.dataset
+
+
+class ReasoningCore(_ClassicEnv):
+    name = "reasoning-core"
+    primary = "score_answer_vf"
+
+    def _load(self):
+        import reasoning_core_env
+
+        return reasoning_core_env.load_environment(num_train_examples=800, num_eval_examples=500, seed=0)
+
+    def _rows(self, split, n=None):
+        return self.env.eval_dataset if split == "eval" else self.env.dataset
+
+
+class AsciiTree(_ClassicEnv):
+    name = "ascii-tree"
+    primary = None  # the env's weighted reward (0.3 similarity + 0.7 continuous)
+
+    def _load(self):
+        import ascii_tree
+
+        return ascii_tree.load_environment()
+
+    def _rows(self, split, n=None):
+        ds = self.env.dataset  # single split: hold out the last EVAL_N rows
+        cut = len(ds) - EVAL_N
+        return ds.select(range(cut, len(ds))) if split == "eval" else ds.select(range(cut))
+
+
+ENVS = {"reverse-text": ReverseText, "medmcqa": MedMCQA, "ifeval": IFEval, "gsm8k": GSM8K,
+        "math500": Math500, "aime": Aime, "pubmedqa": PubMedQA, "reasoning-core": ReasoningCore, "ascii-tree": AsciiTree}
 
 
 @lru_cache(maxsize=None)

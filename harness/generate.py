@@ -27,7 +27,8 @@ from openai import AsyncOpenAI
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from envs import get_env  # noqa: E402
 
-MAX_TOKENS = {"reverse-text": 384, "gsm8k": 768, "medmcqa": 1024, "ifeval": 1024}
+MAX_TOKENS = {"reverse-text": 384, "gsm8k": 768, "medmcqa": 1024, "ifeval": 1024,
+              "math500": 2048, "aime": 6144, "pubmedqa": 1024, "reasoning-core": 1024, "ascii-tree": 768}
 
 
 def _seed(ex_id: str, k: int) -> int:
@@ -37,7 +38,8 @@ def _seed(ex_id: str, k: int) -> int:
 def _lines(path: Path) -> list[str]:
     """JSONL records: split on '\\n' only. str.splitlines() also splits on U+2028/U+2029/U+0085,
     which json.dumps(ensure_ascii=False) leaves raw inside strings, and would cut a record in two."""
-    return [x for x in path.read_text(encoding="utf-8").split("\n") if x.strip()]
+    # errors="replace": a crash can leave a torn tail with invalid bytes; that line then fails json and is dropped
+    return [x for x in path.read_text(encoding="utf-8", errors="replace").split("\n") if x.strip()]
 
 
 def _ci95(xs: list[float]) -> float:
@@ -83,9 +85,17 @@ async def _run(args) -> int:
     jsonl = out.parent / (out.name + ".jsonl")  # not with_suffix: a stem like 'q4-1.7b-base' has a dot in it
     done = set()
     if jsonl.exists() and args.resume:
+        good, bad = [], 0
         for line in _lines(jsonl):
-            r = json.loads(line)
-            done.add((r["id"], r["k"]))
+            try:
+                r = json.loads(line)
+                done.add((r["id"], r["k"]))
+                good.append(line)
+            except ValueError:  # a crash mid-write leaves a torn or NUL-filled tail; drop it and rerun those items
+                bad += 1
+        if bad:
+            jsonl.write_text("".join(x + "\n" for x in good), encoding="utf-8")
+            print(f"resume: dropped {bad} unreadable line(s) from {jsonl.name}", flush=True)
     jobs = [(ex, k) for ex in exs for k in range(args.k) if (ex.id, k) not in done]
     print(f"{args.env}/{args.split}: {len(exs)} examples x k={args.k}; {len(jobs)} to run ({len(done)} resumed)", flush=True)
     t0 = time.time()

@@ -1,0 +1,28 @@
+{
+  "env": "ascii-tree",
+  "split": "eval",
+  "label": "q1-base",
+  "n_examples": 200,
+  "k": 1,
+  "n_samples": 200,
+  "score_mean": 0.0624,
+  "score_ci95": 0.0147,
+  "reward_mean": 0.0624,
+  "metrics_mean": {
+    "ascii_tree_similarity_reward": 0.0647,
+    "ascii_tree_continuous_reward": 0.0615
+  },
+  "completion_tokens_mean": 281.0,
+  "truncated_frac": 0.215,
+  "wall_s_this_run": 178.4,
+  "agg_tokens_per_s_this_run": 315.0,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 768,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

@@ -1,0 +1,27 @@
+{
+  "env": "reasoning-core",
+  "split": "eval",
+  "label": "q4own-base",
+  "n_examples": 500,
+  "k": 1,
+  "n_samples": 500,
+  "score_mean": 0.2555,
+  "score_ci95": 0.037,
+  "reward_mean": 0.2555,
+  "metrics_mean": {
+    "score_answer_vf": 0.2555
+  },
+  "completion_tokens_mean": 69.8,
+  "truncated_frac": 0.032,
+  "wall_s_this_run": 218.1,
+  "agg_tokens_per_s_this_run": 159.9,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_tokens": 1024,
+    "enable_thinking": false,
+    "concurrency": 6
+  },
+  "base_url": "http://127.0.0.1:8096/v1"
+}

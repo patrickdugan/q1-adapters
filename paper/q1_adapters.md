@@ -11,14 +11,20 @@ Adapters: <https://huggingface.co/AlephFunk/bonsai-8b-prime-env-adapters>
 ## Abstract
 
 What is a 1-bit 8B model good for once it is given the cheapest specialization available? We
-score PrismML's **Bonsai 8B** (`Q1_0`, 1.16 GB) on four **Prime Intellect Environments Hub**
-environments — reverse-text, GSM8K, MedMCQA and IFEval — using each environment's own dataset,
-prompt and reward code. Out of the box it trails a 4-bit **Qwen3-8B** (`Q4_K_M`, 5.03 GB) by
-4.5–18.5 points, and at matched memory it beats or ties a 4-bit Qwen3-1.7B (GSM8K +0.05, MedMCQA
-−0.004 on 500 items). A rank-16 task adapter per environment (87 MB; 7–103 minutes on one laptop GPU; trained
-from the environment's own rewards) adds **+0.70** on a skill neither base model has (reverse-text
-0.82 vs 0.21 for the 4-bit 8B), +0.06 on MedMCQA, and nothing measurable where the base already
-samples correct answers. A **72k-parameter recursive router (TRM)** picks the right adapter 99.8% of
+score PrismML's **Bonsai 8B** (`Q1_0`, 1.16 GB) on nine **Prime Intellect Environments Hub**
+environments — reverse-text, GSM8K, MedMCQA, IFEval, PubMedQA, ascii-tree, MATH-500, AIME 2024+2025
+and reasoning-core — using each environment's own dataset, prompt and reward code (200–1,319 items
+per environment). Out of the box, in non-thinking mode, it trails a 4-bit **Qwen3-8B** (`Q4_K_M`,
+5.03 GB) by 4–18.5 points (within noise on reasoning-core). Against a memory-matched 4-bit Qwen3-1.7B the answer depends on reasoning
+load: the 1-bit 8B wins on GSM8K (+0.053, n = 1,319) and short symbolic tasks (reasoning-core +0.045)
+but loses on harder multi-step math (MATH-500 −0.068; AIME 0.067 vs 0.117). The reasoning-heavy
+environments are weak for every model at this size (AIME ≤ 0.24, reasoning-core ≤ 0.26).
+A rank-16 task adapter per environment (87 MB; 7–103 minutes on one laptop GPU; trained
+from the environment's own rewards or gold) adds **+0.70** and **+0.92** on two transformation
+skills neither base model has (reverse-text 0.82 and ascii-tree 0.98, vs 0.21 and 0.23 for the
+4-bit 8B). It adds +0.04–0.07 on MedMCQA, PubMedQA and reasoning-core; on the last two that brings
+the 1-bit model level with or above the base 4-bit 8B. It adds +0.02 on GSM8K, and nothing on
+MATH-500. A **72k-parameter recursive router (TRM)** picks the right adapter 99.8% of
 the time from the prompt, and the routed four-skill library scores a macro 0.693 against 0.598 for
 the 4-bit 8B — in 2.4 GiB of VRAM instead of 5.2 GiB — though on the three tasks the 4-bit model can already
 do, it stays ahead. A lexical lattice router (LDT) used as a hard filter hurts, reproducing the
@@ -42,7 +48,7 @@ with vLLM on an H100; license Apache-2.0). A 1-bit model is weaker out of the bo
 but **what Q1 buys once you add the cheapest specialization available — a small task LoRA — and how
 that compares with the 4-bit model plus the adapters people already publish.**
 
-We answer it on four public **Prime Intellect Environments Hub** environments, using each
+We answer it on nine public **Prime Intellect Environments Hub** environments (four in §3.1–3.7, five more in §3.8), using each
 environment's own dataset, prompt and reward code, so every number below is the score the Hub
 environment would assign.
 
@@ -76,15 +82,27 @@ byte-identical across models.
 | `primeintellect/gsm8k` | first 200 of GSM8K test | math-verify on `#### N` |
 | `maziyar/OpenMed_MedMCQA` | first 200 of the env's validation split | boxed-letter accuracy |
 | `arcee-ai/ifeval` | the env's own seeded 200-row holdout | RLVR-IFEval constraint pass rate |
+| *added in §3.8:* | | |
+| `primeintellect/math500` | all 500 problems of MATH-500 | math-verify on the last `\boxed{}` |
+| `primeintellect/aime2024` + `aime2025` | all 60 problems, 2 samples each | math-verify on the last `\boxed{}` (avg@2, pass@2) |
+| `maziyar/OpenMed_PubMedQA` | first 500 of the env's shuffled PubMedQA-labeled eval split | yes / no / maybe accuracy |
+| `primeintellect/reasoning-core` | the env's 500-row eval stream (seed 0): grammars, logic, planning, arithmetic tasks | the env's per-task scorer |
+| `primeintellect/ascii-tree` | last 200 of the env's rows (the rest = train) | the env's weighted tree similarity (0.3 / 0.7) |
 
 Implementation notes: the three classic-API envs require `verifiers<0.4` (0.4.0 removed
 `vf.Environment`); `primeintellect/gsm8k` is a verifiers-v1 taskset whose `verify.py` we run
 in-process with math-verify's signal/process timeouts disabled (on Windows they spawn a child that
 cannot re-run the script and every answer scores 0) — the scoring logic is otherwise line-for-line.
+`math500` and the two AIME sets are handled the same way (`math500` is a v1 taskset whose package
+imports POSIX-only `fcntl` through `verifiers.v1`, so its prompt, dataset revision and
+`verify_boxed_math_answer` are mirrored in `harness/envs.py`; every env's gold answers score 1.0
+through our wrappers).
 
 **Sampling.** Qwen3's recommended non-thinking settings (T = 0.7, top-p 0.8, top-k 20), one sample
 per eval example with a per-example seed shared by all configurations, so comparisons are paired.
-Max new tokens: 384 (reverse-text), 768 (gsm8k), 1024 (medmcqa, ifeval).
+Max new tokens: 384 (reverse-text), 768 (gsm8k, ascii-tree), 1024 (medmcqa, ifeval, pubmedqa,
+reasoning-core), 2048 (math500), 6144 (AIME — non-thinking solutions to AIME problems run long; at
+3072 three of four smoke-test answers were cut off mid-derivation, not looping).
 
 **Adapters.**
 - *Ours (Bonsai)*: rank-16 LoRA on all seven projections (43.6 M parameters; 87 MB as an f16 GGUF),
@@ -373,15 +391,121 @@ The whole four-skill 1-bit library, router included (72k parameters, negligible)
 than the 4-bit 8B base alone needs — within the budget of a 4 GB GPU, where the 4-bit 8B does not
 fit at all.
 
+### 3.8 More environments, bigger samples: where one bit runs out
+
+The four original environments are mostly behaviour and recall. To see where the 1-bit model's
+capacity runs out, we add five Hub environments that load reasoning progressively harder —
+biomedical evidence judgement (PubMedQA), a structured transformation (ascii-tree), competition math
+(MATH-500, AIME 2024+2025), and procedurally generated symbolic tasks (reasoning-core: 56 task
+families, grammars, logic, planning, automata, code tracing) — and rerun GSM8K on its full
+1,319-item test set and MedMCQA on 1,000. All models stay in non-thinking mode, as in §3.1; these
+are therefore *zero-scratchpad-budget* reasoning numbers, the hardest case for a small model.
+
+| env (metric) | n | Q4 1.7B (1.11 GB) | Q1 8B (1.16 GB) | Q1 + our adapter (1.25 GB) | Q4 8B (5.03 GB) | Q1 − Q4 1.7B | Q1 − Q4 8B |
+|---|---|---|---|---|---|---|---|
+| GSM8K (accuracy, full test) | 1,319 | 0.798 | 0.851 | 0.871 | **0.933** | +0.053 [+0.030, +0.076] | −0.081 [−0.099, −0.063] |
+| MedMCQA (accuracy) | 1,000 | 0.437 | 0.409 | 0.453 | **0.567** | −0.028 [−0.062, +0.008] | −0.158 [−0.194, −0.121] |
+| PubMedQA (accuracy) | 500 | 0.390 | 0.364 | **0.434** ¹ | 0.432 | −0.026 [−0.074, +0.018] | −0.068 [−0.110, −0.028] |
+| ascii-tree (tree similarity) | 200 | 0.106 | 0.062 | **0.981** ¹ | 0.230 | −0.044 [−0.070, −0.019] | −0.168 [−0.202, −0.133] |
+| MATH-500 (accuracy) | 500 | 0.710 | 0.642 | 0.630 ² | **0.810** | −0.068 [−0.108, −0.030] | −0.168 [−0.206, −0.130] |
+| reasoning-core (task score) | 500 | 0.175 | 0.220 | **0.300** ¹ | 0.256 | +0.045 [+0.010, +0.079] | −0.036 [−0.074, +0.002] |
+| AIME 24+25 (avg@2 [pass@2]) | 60 | 0.117 [0.167] | 0.067 [0.083] | — | **0.242 [0.300]** | −0.050 [−0.117, +0.017] | −0.175 [−0.267, −0.092] |
+
+Rows are ordered roughly by reasoning load. Deltas are paired over the same items and seeds, with
+bootstrap 95% CIs. ¹ New phase N2 adapter (below). ² Our GSM8K adapter applied to MATH-500.
+Every Q1 + adapter cell is 1.16 GB of base plus one 87 MB adapter.
+
+![Phase N environments](../results/figures/phase_n_envs.png)
+
+**Bigger samples sharpen two earlier calls.** On the full GSM8K test (n = 1,319), Q1 beats the
+memory-matched 1.7B by +0.053 [+0.030, +0.076] (0.851 vs 0.798) and trails the 8B by 0.081 (0.933).
+Our RFT GSM8K adapter, "nothing measurable" at n = 200–500, is a small but real
+**+0.020 [+0.002, +0.038]**. On MedMCQA at n = 1,000, base Q1 sits below the 1.7B
+(−0.028 [−0.062, +0.008], not significant; 0.409 vs 0.437). Our MedMCQA adapter adds
++0.044 [+0.015, +0.073], to 0.453, which puts the adapted 1-bit model above the 1.7B. The 8B leads
+it by 0.11 (0.567).
+
+**Where the 1-bit model holds up.** On reasoning-core — short-answer symbolic tasks — Q1 beats the
+memory-matched 4-bit 1.7B (+0.045 [+0.010, +0.079]) and is within noise of the 4-bit 8B
+(−0.036 [−0.074, +0.002]). The per-family view has 56 families of 3–17 items each, too small to
+read individually, and it is mixed. Q1 scores zero on a few families where the others do not
+(process inversion, metamath entailment), and leads on others (game moves, word problems). All
+three score zero on the same seven: logic derivation, controlled code
+execution, attribute grammars, dynamic programming, shift-reduce parsing, planning, belief tracking.
+At 0.18–0.26, this environment is weak for *all* three models, as expected of non-thinking 8B-class
+models on procedurally generated multi-step problems.
+
+**Where it runs out: multi-step math.** The ordering that held on GSM8K (Q1 above the 1.7B) reverses
+on harder math: MATH-500 Q1 0.642 vs 1.7B 0.710 (−0.068 [−0.108, −0.030]) vs 8B 0.810; AIME avg@2
+0.067 vs 0.117 vs 0.242 (pass@2 0.083 / 0.167 / 0.300). By MATH-500 difficulty level, Q1 is the
+lowest of the three at every level (level 1: 0.907 vs 0.977 / 0.977; level 5: 0.373 vs 0.433 /
+0.582). It trails the 1.7B by a steady 0.06–0.09, and its gap to the 8B grows, not monotonically,
+from 0.07 at level 1 to 0.21 at level 5. Part of the gap is length. Q1 writes longer solutions and runs out
+of budget more often: 12.8% of its MATH-500 answers and 22.5% of its AIME answers hit the cap, against
+9.6% / 10.0% for the 8B. On the answers that finish, Q1's MATH-500 accuracy is 0.736 (1.7B 0.792,
+8B 0.894). One bit per weight costs the most where a derivation must stay exact over many steps.
+For this kind of task, the 4-bit 1.7B, not the 1-bit 8B, is the better use of ~1.1 GB. An adapter
+does not change that: our GSM8K adapter does not transfer to MATH-500 (−0.012 [−0.052, +0.026]).
+
+**Weak for everyone, for format reasons: ascii-tree and PubMedQA.** ascii-tree (render a
+prose directory description as an ASCII tree) is near the floor for all three base models (Q1 0.062,
+1.7B 0.106, 8B 0.230), with 21–30% of outputs hitting the 768-token cap. It is not hard as reasoning:
+every node name of every gold tree appears in its prompt. The typical failure is copying the
+prompt's *style example* tree into the answer, then appending a garbled version of the real one.
+PubMedQA is a calibration failure
+more than a reasoning one: every model answers "maybe" on 59–65% of items against a 10% gold rate
+(Q1: 327/500 "maybe"; gold 276 yes / 173 no / 51 maybe). The env's system prompt primes this — its
+two worked examples are a "yes" and a "maybe" for "uncertain evidence", with no "no". Accuracy:
+Q1 0.364, 1.7B 0.390, 8B 0.432. Both are the shape of task that an environment-trained adapter fixed
+on reverse-text and MedMCQA, so phase N2 trains one for each. It also trains one for reasoning-core,
+on gold *answers only*, to ask whether a format-level adapter can buy anything on a reasoning task.
+
+**Phase N2: three more environment-trained adapters on the 1-bit model.** Same recipe as §2
+(rank 16, 87 MB, one laptop GPU, 37–89 minutes each):
+
+| env | training signal | Q1 base | Q1 + adapter | paired Δ [95% CI] | Q4 8B base |
+|---|---|---|---|---|---|
+| ascii-tree | env gold trees, 800 train rows | 0.062 | **0.981** | **+0.919 [+0.899, +0.936]** | 0.230 |
+| reasoning-core | env gold *answers* (no derivation), 800 rows | 0.220 | **0.300** | +0.080 [+0.038, +0.119] | 0.256 |
+| PubMedQA | rejection sampling: 400 train prompts × 4, 556 kept | 0.364 | **0.434** | +0.070 [+0.030, +0.110] | 0.432 |
+
+- **ascii-tree** is the reverse-text result again, on a second transformation skill. The 1-bit
+  model plus an 87 MB adapter goes from the worst of the three to near-perfect, 4× the 4-bit 8B. We
+  checked for leakage: no eval prompt appears in training, and 16 eval trees duplicate a training tree
+  (the dataset is a mix). On the other 184 the adapter scores 0.979 (base 0.064, 8B 0.230). Every
+  answer is derivable from its prompt, so this is a learned output discipline, not memorised trees.
+- **reasoning-core**: an adapter that never saw a derivation lifts the score by 0.08, which puts
+  the 1-bit model *above* the base 4-bit 8B. That is not a reasoning gain in the usual sense. 40 of
+  500 base answers lacked the `<answer>` tags (the adapter fixes all of them), but the gain is
+  +0.069 [+0.027, +0.112] even on the 460 the base had already tagged. Answers shrink from ~70 to
+  ~22 tokens. The model now answers directly, in each family's expected answer shape. By family it is
+  a trade: large gains on metamath entailment, abduction and parsing derivations; losses on word
+  problems, constraint satisfaction and probabilistic outcomes. Those are the families where the
+  base, still writing short derivations, was strongest (0.50–0.75). With 3–17 items per family, read these as directions, not estimates. Answer-shape
+  adapters buy points on a procedurally generated benchmark; they do not make an 8B model reason.
+- **PubMedQA**: rejection-sampled from the env's own (yes/no-only) training split, the adapter
+  brings the 1-bit model level with the 4-bit 8B (0.434 vs 0.432). It does not cure the "maybe"
+  habit (327 → 295 of 500); it gains on "yes" items (0.380 → 0.464) and "no" items (0.231 → 0.295).
+
 ## 4. What Q1 buys — and what it does not
 
 - **Buy it for a skill library at a fixed small memory budget.** At ~1.2 GB the 1-bit 8B is the
-  stronger base (vs the 4-bit 1.7B), it is the faster 8B (2.25× decode), and it takes cheap
+  stronger base than the 4-bit 1.7B on recall and short-answer tasks (GSM8K, IFEval, reasoning-core;
+  statistically tied on the two medical sets), though not on long derivations (below). It is the faster 8B (2.25× decode), and it takes cheap
   per-task adapters that a 72k-parameter router can dispatch. Where the deployment needs behaviours
   — formats, transformations, house styles — rather than more world knowledge, this is a better use of
   1.2 GB than a smaller 4-bit model.
-- **Do not buy it for knowledge.** If memory allows the 4-bit 8B, it is 4–14 points better on what
+- **Do not buy it for knowledge.** If memory allows the 4-bit 8B, it is 4–16 points better on what
   both models already know, and self-distilled adapters do not close that gap.
+- **Do not buy it for long exact derivations.** On MATH-500 and AIME the 1-bit 8B trails even the
+  4-bit 1.7B, its solutions run longer and hit the token cap more often, and a GSM8K adapter does
+  not transfer. At ~1.1 GB, a multi-step math workload is better served by the smaller 4-bit model,
+  and better still by a thinking-mode budget on a larger one. In non-thinking mode, every 8B-class
+  model here is weak on AIME (≤ 0.24) and on procedurally generated reasoning (≤ 0.26).
+- **Adapters buy output discipline, not reasoning.** The largest gains in this paper (+0.70
+  reverse-text, +0.92 ascii-tree) are transformation skills whose answer is fully in the prompt. An
+  answer-only adapter gains +0.08 on reasoning-core by changing answer shape, while losing on the
+  families where the base reasoned best.
 - **Train adapters against the weights you serve — and against the environment you are scored by.**
   The 1-bit route gets the first for free (the unpacked checkpoint is the served model, bit for bit).
   On the 4-bit route, Qwen's own `Q4_K_M` GGUF is a different (AWQ-rescaled) checkpoint from the one
@@ -398,9 +522,17 @@ fit at all.
 
 ## 5. Limitations
 
-- **Small eval sets.** 200 items per environment (500 for GSM8K and MedMCQA), one sample per item;
-  several differences are within noise and are reported as such. Sampling follows Qwen3's
-  non-thinking recommendation for every model; thinking mode was not evaluated. PrismML's own
+- **Eval sets.** 200 items for reverse-text and IFEval, and for the cross-adapter and online-adapter
+  comparisons; 500–1,319 for the base-model comparisons (§3.8); 60 AIME problems × 2 samples. One
+  sample per item elsewhere, and several differences are within noise and reported as such.
+  reasoning-core has only 3–17 items per family, so per-family statements are directional.
+- **Non-thinking mode only.** Sampling follows Qwen3's non-thinking recommendation for every model,
+  with fixed token budgets (2,048 for MATH-500, 6,144 for AIME). The reasoning-heavy numbers
+  (§3.8) are therefore lower bounds on what these models do with a scratchpad budget; thinking
+  mode was not evaluated, and 10–22% of competition-math answers hit the budget.
+- **Environment quirks are scored as-is.** PubMedQA's own prompt shows a "maybe" example and no
+  "no" example, and every model over-answers "maybe". ascii-tree's prompts include a style-example
+  tree that models copy. We score what the env scores and do not repair prompts. PrismML's own
   GSM8K/IFEval numbers come from a different harness and dataset version (their IFEval is the Google
   benchmark; ours is the Hub env's RLVR-IFEval holdout), so they are not directly comparable.
 - **One adapter recipe.** Rejection-sampling fine-tuning from the base's own samples can only
@@ -416,15 +548,18 @@ fit at all.
   P2–P8 at ~35–40 W even on AC power) that also caused Windows TDR GPU resets; the speed table uses
   isolated `llama-bench` runs instead. The PrismML fork crashed on Qwen3-1.7B, so that model was served
   by upstream llama.cpp (build b11269); interrupted runs were resumed per item, and partial files from
-  the crashed binary were discarded.
+  the crashed binary were discarded. During the §3.8 runs the GPU was capped at 15 W (of 80 W).
+  An NVIDIA driver bugcheck during a Modern Standby transition killed one adapter training mid-write;
+  that adapter was retrained from scratch and every result file was checked for torn lines.
 - **Router data.** Prompts from four environments are easy to separate when the instructions are
   kept; the content-only view is the harder, more realistic case, and the routers were not tested on
-  out-of-distribution traffic.
+  out-of-distribution traffic. Routing (§3.5) covers the four original adapters; it was not retrained
+  for the seven-adapter library of §3.8.
 
 ## 6. Reproducing
 
 ```
-# environments venv (verifiers<0.4 + the four Hub env packages) and the torch venv (QLoRA)
+# environments venv (verifiers<0.4 + the nine Hub env packages) and the torch venv (QLoRA)
 python harness/generate.py --env gsm8k --split eval --label q1-base --out results/gsm8k/q1-base
 python harness/export_gold.py --env reverse-text --out runs/sft/reverse-text-gold.jsonl
 python harness/generate.py --env gsm8k --split train --n 400 --k 4 --seed 1 --label q1-base-rft --out runs/rft/gsm8k-q1-base
@@ -433,5 +568,7 @@ python harness/routers.py
 python harness/make_tables.py
 ```
 
-The phase scripts (`harness/phase{A,B,C,D,E,X,M}.ps1`) record the exact server configurations. All
+The phase scripts (`harness/phase{A,B,C,D,E,X,M,Y,Z,N,N2}.ps1`) record the exact server configurations
+(§3.8 is phases N and N2; `python harness/export_gold.py --env ascii-tree --n 800 --out ...` builds its
+gold-SFT data). All
 per-sample generations and scores are in `results/`; adapter weights are kept outside the repository.
