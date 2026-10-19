@@ -1,12 +1,21 @@
 # One gigabyte, many skills: task adapters on a 1-bit 8B model, scored on Prime Intellect environments
 
-**Patrick Dugan** (Red Team Gladiatorics) · draft prepared with Claude · 2026-10-18
+**Patrick Dugan** (Red Team Gladiatorics) · draft prepared with Claude · draft 2, 2026-10-19
 
 Code and per-sample results: <https://github.com/patrickdugan/q1-adapters> ·
 Adapters: <https://huggingface.co/AlephFunk/bonsai-8b-prime-env-adapters>
 
 *Draft. Every number is computed from the per-sample files in `results/` by
 `harness/make_tables.py` and `harness/routers.py`.*
+
+*Revision note (draft 2, 2026-10-19).* Draft 1 (2026-10-18) covered four environments. This draft
+adds five more Prime Intellect Hub environments (PubMedQA, ascii-tree, MATH-500, AIME 2024+2025,
+reasoning-core) on all three base models, and reruns GSM8K on its full test set (1,319) and MedMCQA
+on 1,000 (new §3.8). It also adds three adapters (ascii-tree, reasoning-core, PubMedQA). The abstract,
+§4 and §5 are revised to match. Two draft-1 statements changed with the larger samples: the GSM8K
+adapter's gain, "nothing measurable" at n = 200–500, is +0.020 [+0.002, +0.038] at n = 1,319; and
+base Q1 vs the 4-bit 1.7B on MedMCQA moved from −0.004 (n = 500) to −0.028 (n = 1,000, still not
+significant). §3.1–3.7 are otherwise unchanged and keep their original sample sizes.
 
 ## Abstract
 
