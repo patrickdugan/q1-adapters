@@ -12,6 +12,9 @@ on:
       - 'harness/test_hyperspace_pod.py'
       - 'harness/generate.py'
       - '.github/workflows/hyperspace-pod.yml'
+permissions:
+  contents: read
+
 jobs:
   offline-contract:
     runs-on: ubuntu-latest
