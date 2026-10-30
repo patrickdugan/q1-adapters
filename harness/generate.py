@@ -26,6 +26,9 @@ from openai import AsyncOpenAI
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from envs import get_env  # noqa: E402
+from hyperspace_pod import (  # noqa: E402
+    ensure_resume_identity, pod_key, preflight_models, request_options, validate_base_url,
+)
 
 MAX_TOKENS = {"reverse-text": 384, "gsm8k": 768, "medmcqa": 1024, "ifeval": 1024,
               "math500": 2048, "aime": 6144, "pubmedqa": 1024, "reasoning-core": 1024, "ascii-tree": 768}
@@ -51,13 +54,12 @@ def _ci95(xs: list[float]) -> float:
 async def _one(client, sem, args, ex, k, max_tokens):
     async with sem:
         t0 = time.time()
-        extra = {"top_k": args.top_k, "seed": _seed(ex.id, k),
-                 "chat_template_kwargs": {"enable_thinking": False}}
+        backend_opts = request_options(args.backend, _seed(ex.id, k), args.top_k)
         for attempt in range(4):
             try:
                 resp = await client.chat.completions.create(
                     model=args.model, messages=ex.messages, temperature=args.temperature,
-                    top_p=args.top_p, max_tokens=max_tokens, extra_body=extra)
+                    top_p=args.top_p, max_tokens=max_tokens, **backend_opts)
                 break
             except Exception as exc:  # noqa: BLE001 - transient server errors
                 if attempt == 3:
@@ -75,24 +77,41 @@ async def _one(client, sem, args, ex, k, max_tokens):
 
 
 async def _run(args) -> int:
+    endpoint = {"backend": args.backend, "base_url": args.base_url.rstrip("/"),
+                "model": args.model}
+    if args.backend == "hyperspace":
+        endpoint["base_url"] = validate_base_url(args.base_url)
+        if args.model == "local":
+            raise ValueError("Hyperspace requires an explicit --model matching /v1/models")
+        key = pod_key(args.api_key_env)
+        preflight_models(endpoint["base_url"], key, args.model)
+    else:
+        key = "local"
+    args.base_url = endpoint["base_url"]
     env = get_env(args.env)
     exs = env.examples(args.split, args.n, seed=args.seed)
     max_tokens = args.max_tokens or MAX_TOKENS[args.env]
-    client = AsyncOpenAI(base_url=args.base_url, api_key="local", timeout=900)
+    client = AsyncOpenAI(base_url=args.base_url, api_key=key, timeout=900)
     sem = asyncio.Semaphore(args.concurrency)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     jsonl = out.parent / (out.name + ".jsonl")  # not with_suffix: a stem like 'q4-1.7b-base' has a dot in it
     done = set()
+    if (args.backend == "hyperspace" and jsonl.exists()
+            and jsonl.stat().st_size and not args.resume):
+        raise ValueError("Hyperspace output exists; choose a new --out or use --resume")
     if jsonl.exists() and args.resume:
         good, bad = [], 0
         for line in _lines(jsonl):
             try:
                 r = json.loads(line)
-                done.add((r["id"], r["k"]))
-                good.append(line)
             except ValueError:  # a crash mid-write leaves a torn or NUL-filled tail; drop it and rerun those items
                 bad += 1
+                continue
+            if args.backend == "hyperspace":
+                ensure_resume_identity(r, endpoint)
+            done.add((r["id"], r["k"]))
+            good.append(line)
         if bad:
             jsonl.write_text("".join(x + "\n" for x in good), encoding="utf-8")
             print(f"resume: dropped {bad} unreadable line(s) from {jsonl.name}", flush=True)
@@ -106,6 +125,7 @@ async def _run(args) -> int:
             row = await fut
             row.update(env.score(row["text"], exmap[row["id"]]))
             row["label"] = args.label
+            row["endpoint"] = endpoint
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
             fh.flush()
             if i % 50 == 0:
@@ -124,8 +144,12 @@ async def _run(args) -> int:
         "truncated_frac": round(sum(r["finish_reason"] == "length" for r in rows) / len(rows), 4),
         "wall_s_this_run": round(wall, 1), "agg_tokens_per_s_this_run": round(sum(toks) / wall, 1) if jobs and wall else None,
         "sampling": {"temperature": args.temperature, "top_p": args.top_p, "top_k": args.top_k,
-                     "max_tokens": max_tokens, "enable_thinking": False, "concurrency": args.concurrency},
+                     "max_tokens": max_tokens,
+                     "enable_thinking": False if args.backend == "llama" else "backend_default",
+                     "seed_honored": "unverified" if args.backend == "hyperspace" else "server_dependent",
+                     "concurrency": args.concurrency},
         "base_url": args.base_url,
+        "endpoint": endpoint,
     }
     (out.parent / (out.name + ".summary.json")).write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({k: summary[k] for k in ("env", "label", "n_samples", "score_mean", "score_ci95", "reward_mean",
@@ -143,6 +167,9 @@ def main(argv=None) -> int:
     p.add_argument("--label", required=True)
     p.add_argument("--out", required=True, help="output path stem")
     p.add_argument("--base-url", default="http://127.0.0.1:8096/v1")
+    p.add_argument("--backend", choices=("llama", "hyperspace"), default="llama")
+    p.add_argument("--api-key-env", default="HYPERSPACE_POD_API_KEY",
+                   help="environment variable holding the pod API key")
     p.add_argument("--model", default="local")
     p.add_argument("--temperature", type=float, default=0.7)
     p.add_argument("--top-p", type=float, default=0.8)

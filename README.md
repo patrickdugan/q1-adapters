@@ -77,3 +77,47 @@ Also:
 - PrismML llama.cpp fork (build 10743) for every model (Q1_0 requires it); upstream `convert_lora_to_gguf.py`.
 
 Weights (Bonsai, Qwen3 GGUF, all adapters) live outside the repo and are not committed.
+
+## Hyperspace pod inference (experimental)
+
+Use the Hyperspace gateway as a separately identified inference backend for model
+evaluation. The existing llama-server behavior remains the default. Pod generation
+uses portable OpenAI chat fields and records the endpoint and exact model ID in
+each result row, so an interrupted pod run cannot silently resume a llama.cpp run.
+
+1. Create and start a pod with Hyperspace CLI; inspect sharding first:
+
+   ```bash
+   hyperspace pod create q1-lab
+   hyperspace start
+   hyperspace pod resources
+   hyperspace pod shard qwen3.6-27b --dry-run
+   hyperspace pod shard qwen3.6-27b
+   hyperspace pod keys create --name q1-eval --scopes qwen3.6-27b
+   ```
+
+2. Export the resulting key as `HYPERSPACE_POD_API_KEY` (keep it outside the repo).
+   Check that the pod advertises the exact `--model` ID, then run:
+
+   ```bash
+   python harness/generate.py --backend hyperspace --base-url http://127.0.0.1:8080/v1 \
+       --model qwen3.6-27b --env gsm8k --split eval --n 20 --k 1 \
+       --label pod-qwen36 --out runs/pod-qwen36-gsm8k --concurrency 1
+   ```
+
+`/v1/models` is checked before sampling. The adapter reads the key from the
+named environment variable and never records it in JSONL or the summary.
+The runner rejects cleartext non-loopback gateway URLs. Each run stores its
+`backend`, `base_url`, and `model`; `--resume` on a pod run checks this identity
+on every existing row. Use a new `--out` for each local/pod configuration.
+
+Hyperspace's current gateway contract is OpenAI-compatible chat completions.
+Gateway support for optional `seed` varies, and distributed routing may affect
+determinism and timings. The Hyperspace backend omits llama.cpp-specific `top_k`
+and `chat_template_kwargs` request extensions. Treat comparisons as backend
+experiments and record the pod shard plan, hardware, CLI version, network,
+quantization, and activation format separately. The gateway does not certify
+which nodes executed an individual request.
+
+Offline tests: `python -m unittest discover -s harness -p 'test_hyperspace_pod.py' -v`.
+See the [Hyperspace pod docs](https://pods.hyper.space/) for current CLI commands.
